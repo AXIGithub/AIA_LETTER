@@ -183,7 +183,7 @@ public class View_AIA extends javax.swing.JFrame {
             }
         });
 
-        jComboBox2Reg.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "KONVEN", "SYARIAH" }));
+        jComboBox2Reg.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "ANST", "DTST" }));
         jComboBox2Reg.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBox2RegActionPerformed(evt);
