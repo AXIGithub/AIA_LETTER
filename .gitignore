@@ -1,0 +1,58 @@
+# NetBeans specific files
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbproject/project.properties
+/nbproject/project.xml
+
+# NetBeans specific files (more generic)
+# These are often regenerated and can cause conflicts
+# Uncomment if you prefer to exclude all nbproject files except the essential ones
+# /nbproject/*
+# !/nbproject/project.properties
+# !/nbproject/project.xml
+
+# Java compiled output
+/build/
+/dist/
+*.jar
+*.war
+*.ear
+*.zip
+*.rar
+*.class
+# Eclipse specific (often found in mixed environments)
+.project
+.classpath
+.settings/
+
+# Maven specific (if using Maven with NetBeans)
+/target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# Gradle specific (if using Gradle with NetBeans)
+.gradle/
+/build/
+
+# Log files
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+*~
+*.bak
+*.swp
+.DS_Store # macOS specific
+Thumbs.db # Windows specific
+
+#Other
+lib/
+BACKUP/
