@@ -56,7 +56,7 @@ public class Processing {
 //        paperDirectory = currentDirectory + "\\" + "Paper" + "\\";
 //        fontsDirectory = pd.configurePath(this.currentDirectory + "\\" + "FONTS\\");
         
-        readyToPrintCyDirectory = this.currentDirectory + "\\READY TO PRINT" + "\\CIMB CUSTODY " + product  + "\\";
+        readyToPrintCyDirectory = this.currentDirectory + "\\READY TO PRINT" + "\\AIA LETTER " + product  + "\\";
         readyToPrintCyLogDirectory = pd.configurePath(readyToPrintCyDirectory + "\\LOG\\");
         readyToPrintCyPrintDirectory = pd.configurePath(readyToPrintCyDirectory + "\\OUTPUT\\");
         readyToPrintCyReportDirectory = pd.configurePath(readyToPrintCyDirectory + "\\REPORT\\");
