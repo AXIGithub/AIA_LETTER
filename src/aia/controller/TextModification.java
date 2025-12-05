@@ -5,6 +5,15 @@
 
 package aia.controller;
 
+import com.itextpdf.text.Chunk;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.ColumnText;
+import com.itextpdf.text.pdf.PdfContentByte;
 import static com.itextpdf.text.pdf.PdfName.S;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -15,9 +24,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -760,6 +773,14 @@ private static final String[] ANGKA = {"", "satu", "dua", "tiga", "empat", "lima
       }
         return calendar;
     }
+    
+    public String convertDateMM(String dateParam) throws ParseException{
+        SimpleDateFormat input = new SimpleDateFormat("yyyyMMdd");
+        SimpleDateFormat output = new SimpleDateFormat("dd MMMM yyyy", new Locale("id", "ID"));
+        Date date = input.parse(dateParam);
+        return output.format(date);
+        
+    }
 
     public String getSeparatorDate(String date){
         String convertDate = new String();
@@ -1059,6 +1080,52 @@ private static final String[] ANGKA = {"", "satu", "dua", "tiga", "empat", "lima
             return S + new String(new char[Len - L]).replace('\0', C);
         } else {
             return S;
+        }
+    }
+    
+    public void writeParagraph(String text, Document document, float left, float bottom, float right, float top, PdfContentByte canvas, BaseFont baseFont, float fontSize, float lineSpacing) {
+// Rectangle rect = new Rectangle(leftMargin, rightMargin);
+        // Paragraph p = new Paragraph(text).
+        Font linkFont = new Font(baseFont, fontSize, Font.UNDERLINE);
+        Font contentFont = new Font(baseFont, fontSize);
+//        Chunk chunk = new Chunk(text, font);
+//        chunk.setUnderline(0.1f, -2f);
+//        Phrase phrase = new Phrase(text, font);
+        Phrase phrase = new Phrase();
+        
+        Pattern linkPattern = Pattern.compile("(https?://\\S+)");
+        Matcher matcher = linkPattern.matcher(text);
+        int lastEnd = 0;
+        
+        while (matcher.find()) {
+            if (matcher.start() > lastEnd) {
+                String textBefore = text.substring(lastEnd, matcher.start());
+                phrase.add(new Chunk(textBefore, contentFont));
+            }
+
+            String linkText = matcher.group();
+            Chunk linkChunk = new Chunk(linkText, linkFont);
+//            linkChunk.setUnderline(0.1f, -2f);
+//            linkChunk.setAnchor(linkText);
+            phrase.add(linkChunk);
+
+            lastEnd = matcher.end();
+        }
+        
+        if (lastEnd < text.length()) {
+            phrase.add(new Chunk(text.substring(lastEnd), contentFont));
+        }
+
+        ColumnText ct = new ColumnText(canvas);
+        ct.setSimpleColumn(left, bottom, right, top);
+        ct.setLeading(0, lineSpacing);
+        ct.setAlignment(Element.ALIGN_JUSTIFIED);
+        ct.setText(phrase);
+        try {
+            ct.go();
+        } catch (DocumentException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
     }
     

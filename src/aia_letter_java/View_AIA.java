@@ -27,6 +27,7 @@ import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
+import utils.ProductCode;
 
 /**
  *
@@ -37,6 +38,7 @@ public class View_AIA extends javax.swing.JFrame {
     Directory dir;
     private FileChooser opn = new FileChooser();
     private PathDirectory pd = new PathDirectory();
+    ProductCode productCode = new ProductCode();
 //    CreateDirectoryModel createDir = new CreateDirectoryModel(".");
 //    BsController bsc = new BsController(createDir);
     private String inputDir = new String();
@@ -470,10 +472,12 @@ public class View_AIA extends javax.swing.JFrame {
             // TODO add your handling code here:
             CreateDirectoryModel createDir = new CreateDirectoryModel();
             Processing processing = new Processing();
+            ProductCode code = new ProductCode();
             this.category = jComboBox1SA.getSelectedItem().toString();
-            String department = fileName.contains("SYARIAH") ? "SYARIAH" : "KONVEN";
-            String type = fileName.contains("DVP") ? "DVP" : fileName.contains("KUPON") ? "KUPON" : fileName.contains("MATURITY") ? "MATURITY" : "RVP";
-            String[] argumens = {inputDir + fileName, inputDir, department, type, category};
+            this.cycle = jTextDate.getText().substring(3, 5) + jTextDate.getText().substring(0, 2) + jTextDate.getText().substring(6, 10) ;
+            String department = "AIA";
+            String type = code.getProductCode(fileName);
+            String[] argumens = {inputDir + fileName, inputDir, department, type, category, cycle};
             processing.createCustody(argumens);
         } catch (DocumentException ex) {
             Logger.getLogger(View_AIA.class.getName()).log(Level.SEVERE, null, ex);
