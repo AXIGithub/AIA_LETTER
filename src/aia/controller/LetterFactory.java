@@ -5,8 +5,11 @@
  */
 package aia.controller;
 
+import aia.poa_product.CreatePdfACD;
+import aia.poa_product.CreatePdfACM;
 import aia.poa_product.CreatePdfAPH;
 import aia.poa_product.CreatePdfAPL;
+import aia.poa_product.CreatePdfKPDI1;
 
 /**
  *
@@ -21,6 +24,12 @@ public class LetterFactory {
                 return new CreatePdfAPH();
             case "APL":
                 return new CreatePdfAPL();
+            case "ACM":
+                return new CreatePdfACM();
+            case "ACD":
+                return new CreatePdfACD();
+            case "KPDI1":
+                return new CreatePdfKPDI1();
             default:
                  throw new IllegalArgumentException("Template untuk produk " + product + " tidak ditemukan!\nHubungi IT");
         }

@@ -20,6 +20,10 @@ public class ProductCode {
         switch(productCode.toUpperCase()){
             case "APH":
                 return "Status Polis Menjadi Cuti Premi/Kontribusi Otomatis";
+            case "APL":
+                return "Penggunaan Fasilitas Pinjaman Polis Otomatis";
+            case "KPDI1":
+                return "Konfirmasi Pengembalian Dana Investasi 1";
             default :
                 return "";
         }

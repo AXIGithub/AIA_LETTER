@@ -28,7 +28,7 @@ import java.util.logging.Logger;
  *
  * @author Ratino
  */
-public class CreatePdfAPH implements BasePdfGenerator{
+public class CreatePdfACM implements BasePdfGenerator{
     
     TextModification txt = new TextModification();
     private PdfReader dataReaderPreprinted = null;
@@ -43,18 +43,15 @@ public class CreatePdfAPH implements BasePdfGenerator{
     
     private String currDir = new String();
     private String paperDir = new String();
-    private String sortingDir = new String();
-    private String outputDir = new String();
     
     
 
     @Override
     public void generate(PolisModel polisModel, String product, String[] params) throws Exception {
-        sortingDir = params[2];
         getCurrentDir();
         Document document = new Document(PageSize.A4);
         PdfWriter writer = PdfWriter.getInstance(document,
-                new FileOutputStream(sortingDir + product + "_" + polisModel.getChdrnum() + ".pdf"));
+                new FileOutputStream(product + "_" + polisModel.getChdrnum() + ".pdf"));
         
         dataReaderPreprinted = new PdfReader(paperDir + "PAPER AIA.pdf");
 
@@ -68,7 +65,6 @@ public class CreatePdfAPH implements BasePdfGenerator{
 
         BaseFont helvatica = BaseFont.createFont(BaseFont. HELVETICA, BaseFont.CP1250, BaseFont.NOT_EMBEDDED);
         BaseFont helvaticaBold = BaseFont.createFont(BaseFont. HELVETICA_BOLD, BaseFont.CP1250, BaseFont.NOT_EMBEDDED);
-//        BaseFont arial = BaseFont.createFont(BaseFont.
         canvas.beginText();
         canvas.setFontAndSize(helvatica, 10);
 
@@ -76,62 +72,14 @@ public class CreatePdfAPH implements BasePdfGenerator{
         canvas.showTextAligned(Element.ALIGN_LEFT, "Kepada yang terhormat :", xAddr, yAddr, 0);
         yAddr = (float) (yAddr - 10);
         canvas.setFontAndSize(helvaticaBold, 10);
-        
-        String owner = polisModel.getOwner();
-        String owner1 = owner;
-        String owner2 = "";
-        
-        String[] split = owner.split(" "); 
-        
-        if (owner.length() > 25) {
-            StringBuilder sb1 = new StringBuilder();
-            StringBuilder sb2 = new StringBuilder();
-
-            for (int i = 0; i < split.length; i++) {
-                if (i <= 1) { 
-                    sb1.append(split[i]).append(" ");
-                } else {
-                    sb2.append(split[i]).append(" ");
-                }
-            }
-
-            owner1 = sb1.toString().trim();
-            owner2 = sb2.toString().trim();
-        }
-
-        
-        canvas.showTextAligned(Element.ALIGN_LEFT, "Bapak/Ibu " + owner1, xAddr, yAddr, 0);
-        yAddr -= 10;
-        
-        if (!owner2.isEmpty()) {
-            canvas.showTextAligned(Element.ALIGN_LEFT, owner2, xAddr, yAddr, 0);
-            yAddr -= 10;
-        }
-
-//        canvas.showTextAligned(Element.ALIGN_LEFT, "Bapak/Ibu " + polisModel.getOwner(), xAddr, yAddr, 0);
-//        yAddr = (float) (yAddr - 10);
+        canvas.showTextAligned(Element.ALIGN_LEFT, "Bapak/Ibu " + polisModel.getOwner(), xAddr, yAddr, 0);
+        yAddr = (float) (yAddr - 10);
         canvas.setFontAndSize(helvatica, 10);
-//        canvas.showTextAligned(Element.ALIGN_LEFT, polisModel.getAlamat1(), xAddr, yAddr, 0);
-//        yAddr = (float) (yAddr - 10);
-//        canvas.showTextAligned(Element.ALIGN_LEFT, polisModel.getAlamat2()+ " " + polisModel.getAlamat3(), xAddr, yAddr, 0);
-//        yAddr = (float) (yAddr - 10);
-//        canvas.showTextAligned(Element.ALIGN_LEFT, polisModel.getAlamat4()+ " " + polisModel.getAlamat5(), xAddr, yAddr, 0);
-        
-        String[] lines = {
-        polisModel.getAlamat1(),
-        polisModel.getAlamat2(),
-        polisModel.getAlamat3(),
-        polisModel.getAlamat4(),
-        polisModel.getAlamat5()
-        };
-
-        for (String line : lines) {
-            if (line != null && !line.trim().isEmpty()) {
-                canvas.showTextAligned(Element.ALIGN_LEFT, line, xAddr, yAddr, 0);
-                yAddr -= 10;
-            }
-        }
-
+        canvas.showTextAligned(Element.ALIGN_LEFT, polisModel.getAlamat1(), xAddr, yAddr, 0);
+        yAddr = (float) (yAddr - 10);
+        canvas.showTextAligned(Element.ALIGN_LEFT, polisModel.getAlamat2()+ " " + polisModel.getAlamat3(), xAddr, yAddr, 0);
+        yAddr = (float) (yAddr - 10);
+        canvas.showTextAligned(Element.ALIGN_LEFT, polisModel.getAlamat4()+ " " + polisModel.getAlamat5(), xAddr, yAddr, 0);
 
         // ================= INFO POLIS =====================
         // No Polis
@@ -153,16 +101,9 @@ public class CreatePdfAPH implements BasePdfGenerator{
         canvas.setFontAndSize(helvatica, 10);
         canvas.showTextAligned(Element.ALIGN_LEFT, "Nama Tertanggung", xInfo, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
-
         canvas.setFontAndSize(helvaticaBold, 10);
-        canvas.showTextAligned(Element.ALIGN_LEFT, owner1, xDataInfo, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, polisModel.getOwner(), xDataInfo, yInfo, 0);
         yInfo -= 10;
-
-        if (!owner2.isEmpty()) {
-            canvas.showTextAligned(Element.ALIGN_LEFT, owner2, xDataInfo, yInfo, 0);
-            yInfo -= 10;
-        }
-
 
         // Tanggal Mulai Asuransi
         canvas.setFontAndSize(helvatica, 10);
@@ -216,24 +157,9 @@ public class CreatePdfAPH implements BasePdfGenerator{
         
         // ===================== ISI SURAT ==========================
 
-        int topY = 540;   // posisi atas kolom
-        int bottomY = 100; // posisi bawah kolom
-
-        ColumnText ct = new ColumnText(canvas);
-        ct.setSimpleColumn(
-                xAddr,         // kiri
-                bottomY,       // bawah
-                550,           // kanan (lebar tulisan)
-                topY           // atas
-        );
-
-        Font f = new Font(Font.FontFamily.HELVETICA, 11);
-        Paragraph p = new Paragraph();
-        p.setFont(f);
-        p.setLeading(16f);
-        p.setAlignment(Element.ALIGN_JUSTIFIED);
-
-        
+        int topY = 550;   // posisi atas kolom
+        int bottomY = 50; // posisi bawah kolom   
+        int rightX = 545; // Posisi kanan kolom
         
         String paragraph = "Dengan Hormat,\n" + "\n" +
                 "Terima kasih atas kepercayaan Anda telah memilih PT AIA FINANCIAL (AIA) sebagai penyedia kebutuhan asuransi bagi Anda dan keluarga.\n" + ".\n" +
@@ -255,7 +181,7 @@ public class CreatePdfAPH implements BasePdfGenerator{
                 "\n";
 
         
-        txt.writeParagraph(paragraph, document, xAddr, 50, 545, 550, canvas, helvatica, 10, 1.2f);
+        txt.writeParagraph(paragraph, document, xAddr, bottomY, 545, topY, canvas, helvatica, 10, 1.2f);
 
         canvas.endText();
         document.close();
@@ -269,7 +195,7 @@ public class CreatePdfAPH implements BasePdfGenerator{
             currDir = ""+new java.io.File(".").getCanonicalPath();
             paperDir = currDir + "\\\\" + "PAPER\\\\";
         } catch (IOException ex) {
-            Logger.getLogger(CreatePdfAPH.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CreatePdfACM.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
