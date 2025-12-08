@@ -34,6 +34,11 @@ public class CreatePdfAPH implements BasePdfGenerator{
     private PdfReader dataReaderPreprinted = null;
     private PdfWriter writerNew = null;
     private PdfImportedPage pageData = null;
+    
+    private BaseFont arial;
+    private BaseFont arialUnderline;
+    private BaseFont arialBold;    
+    private BaseFont barcodeFont;
     private float yAddr = 712;
     private float xAddr = 72;
     private float yInfo = 717;
@@ -43,8 +48,10 @@ public class CreatePdfAPH implements BasePdfGenerator{
     
     private String currDir = new String();
     private String paperDir = new String();
+    private String dirFonts = new String();
     private String sortingDir = new String();
     private String outputDir = new String();
+    
     
     
 
@@ -68,16 +75,21 @@ public class CreatePdfAPH implements BasePdfGenerator{
 
         BaseFont helvatica = BaseFont.createFont(BaseFont. HELVETICA, BaseFont.CP1250, BaseFont.NOT_EMBEDDED);
         BaseFont helvaticaBold = BaseFont.createFont(BaseFont. HELVETICA_BOLD, BaseFont.CP1250, BaseFont.NOT_EMBEDDED);
+        arial = BaseFont.createFont(dirFonts + "Arial.ttf", BaseFont.IDENTITY_H, true);
+        arialUnderline = BaseFont.createFont(dirFonts + "ArialUnderline.ttf", BaseFont.IDENTITY_H, true);
+        arialBold = BaseFont.createFont(dirFonts + "arial_bold.ttf", BaseFont.IDENTITY_H, true);
+        
+        
         canvas.beginText();
-        canvas.setFontAndSize(helvatica, 10);
+        canvas.setFontAndSize(arial, 9);
 
         // ================= HEADER =======================
         canvas.showTextAligned(Element.ALIGN_LEFT, "Kepada yang terhormat :", xAddr, yAddr, 0);
         yAddr = (float) (yAddr - 10);
-        canvas.setFontAndSize(helvaticaBold, 10);
+        canvas.setFontAndSize(arialBold, 9);
         canvas.showTextAligned(Element.ALIGN_LEFT, "Bapak/Ibu " + polisModel.getOwner(), xAddr, yAddr, 0);
         yAddr = (float) (yAddr - 10);
-        canvas.setFontAndSize(helvatica, 10);
+        canvas.setFontAndSize(arial, 10);
         canvas.showTextAligned(Element.ALIGN_LEFT, polisModel.getAlamat1(), xAddr, yAddr, 0);
         yAddr = (float) (yAddr - 10);
         canvas.showTextAligned(Element.ALIGN_LEFT, polisModel.getAlamat2()+ " " + polisModel.getAlamat3(), xAddr, yAddr, 0);
@@ -88,64 +100,64 @@ public class CreatePdfAPH implements BasePdfGenerator{
         // No Polis
         canvas.showTextAligned(Element.ALIGN_LEFT, "No. Polis", xInfo, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
-        canvas.setFontAndSize(helvaticaBold, 10);
+        canvas.setFontAndSize(arialBold, 9);
         canvas.showTextAligned(Element.ALIGN_LEFT, polisModel.getChdrnum(), xDataInfo, yInfo, 0);
         yInfo -= 10;
 
         // Nama Produk
-        canvas.setFontAndSize(helvatica, 10);
+        canvas.setFontAndSize(arial, 9);
         canvas.showTextAligned(Element.ALIGN_LEFT, "Nama Produk", xInfo, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
-        canvas.setFontAndSize(helvaticaBold, 10);
+        canvas.setFontAndSize(helvaticaBold, 9);
         canvas.showTextAligned(Element.ALIGN_LEFT, polisModel.getProd_name(), xDataInfo, yInfo, 0);
         yInfo -= 10;
 
         // Nama Tertanggung
-        canvas.setFontAndSize(helvatica, 10);
+        canvas.setFontAndSize(arial, 9);
         canvas.showTextAligned(Element.ALIGN_LEFT, "Nama Tertanggung", xInfo, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
-        canvas.setFontAndSize(helvaticaBold, 10);
+        canvas.setFontAndSize(helvaticaBold, 9);
         canvas.showTextAligned(Element.ALIGN_LEFT, polisModel.getOwner(), xDataInfo, yInfo, 0);
         yInfo -= 10;
 
         // Tanggal Mulai Asuransi
-        canvas.setFontAndSize(helvatica, 10);
+        canvas.setFontAndSize(arial, 9);
         canvas.showTextAligned(Element.ALIGN_LEFT, "Tanggal Mulai Asuransi", xInfo, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
-        canvas.setFontAndSize(helvaticaBold, 10);
+        canvas.setFontAndSize(arialBold, 9);
         canvas.showTextAligned(Element.ALIGN_LEFT, polisModel.getPtdate(), xDataInfo, yInfo, 0);
         yInfo -= 10;
 
         // Premi / Kontribusi
-        canvas.setFontAndSize(helvatica, 10);
+        canvas.setFontAndSize(arial, 9);
         canvas.showTextAligned(Element.ALIGN_LEFT, "Premi/Kontribusi", xInfo, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
-        canvas.setFontAndSize(helvaticaBold, 10);
+        canvas.setFontAndSize(arialBold, 9);
         canvas.showTextAligned(Element.ALIGN_LEFT, "Rp " + polisModel.getSinstamt(), xDataInfo, yInfo, 0);
         yInfo -= 10;
 
         // Periode Bayar
-        canvas.setFontAndSize(helvatica, 10);
+        canvas.setFontAndSize(arial, 9);
         String periode = polisModel.getBillfreq().equals("12") ? "Bulanan" : polisModel.getBillfreq();
         canvas.showTextAligned(Element.ALIGN_LEFT, "Periode Bayar", xInfo, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
-        canvas.setFontAndSize(helvaticaBold, 10);
+        canvas.setFontAndSize(arialBold, 9);
         canvas.showTextAligned(Element.ALIGN_LEFT, periode, xDataInfo, yInfo, 0);
         yInfo -= 10;
 
         // Status Polis
-        canvas.setFontAndSize(helvatica, 10);
+        canvas.setFontAndSize(arial, 9);
         canvas.showTextAligned(Element.ALIGN_LEFT, "Status Polis", xInfo, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
-        canvas.setFontAndSize(helvaticaBold, 10);
+        canvas.setFontAndSize(arialBold, 9);
         canvas.showTextAligned(Element.ALIGN_LEFT, "Aktif", xDataInfo, yInfo, 0);
         yInfo -= 10;
 
         // Tanggal Cetak
-        canvas.setFontAndSize(helvatica, 10);
+        canvas.setFontAndSize(arial, 9);
         canvas.showTextAligned(Element.ALIGN_LEFT, "Tanggal Cetak", xInfo, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
-        canvas.setFontAndSize(helvaticaBold, 10);
+        canvas.setFontAndSize(arialBold, 9);
         canvas.showTextAligned(Element.ALIGN_LEFT, txt.convertDateMM(polisModel.getChdrdue()) , xDataInfo, yInfo, 0);
         yInfo -= 10;
 
@@ -153,10 +165,10 @@ public class CreatePdfAPH implements BasePdfGenerator{
         // ========== PERIHAL ===========================
         canvas.showTextAligned(Element.ALIGN_LEFT,
                 "Perihal : Status Polis Cuti Premi/Kontribusi Otomatis", xAddr, 561, 0);
-        canvas.setFontAndSize(helvaticaBold, 10);
+        canvas.setFontAndSize(arialBold, 9);
         canvas.showTextAligned(Element.ALIGN_RIGHT,
                 "Jakarta, " + txt.convertDateMM(polisModel.getChdrdue()) , 544, 561, 0);
-        canvas.setFontAndSize(helvatica, 10);
+        canvas.setFontAndSize(arial, 9);
         
         // ===================== ISI SURAT ==========================
 
@@ -180,7 +192,7 @@ public class CreatePdfAPH implements BasePdfGenerator{
         
         
         String paragraph = "Dengan Hormat,\n" + "\n" +
-                "Terima kasih atas kepercayaan Anda telah memilih PT AIA FINANCIAL (AIA) sebagai penyedia kebutuhan asuransi bagi Anda dan keluarga.\n" + ".\n" +
+                "Terima kasih atas kepercayaan Anda telah memilih PT AIA FINANCIAL (AIA) sebagai penyedia kebutuhan asuransi bagi Anda dan keluarga.\n" + "\n" +
                 
                 "Kami memahami kesibukan Anda sehingga sampai surat ini diterbitkan, kami belum menerima pembayaran Premi/Kontribusi Polis Anda untuk jatuh tempo tanggal "
                         + txt.convertDateMM(polisModel.getChdrdue())  + " (Tanggal Jatuh Tempo) yang telah melewati Masa Leluasa.\n" + "\n" +
@@ -199,7 +211,7 @@ public class CreatePdfAPH implements BasePdfGenerator{
                 "\n";
 
         
-        txt.writeParagraph(paragraph, document, xAddr, 50, 545, 550, canvas, helvatica, 10, 1.2f);
+        txt.writeParagraph(paragraph, document, xAddr, 50, 545, 550, canvas, arial, 9, 1.2f);
 
         canvas.endText();
         document.close();
@@ -212,6 +224,7 @@ public class CreatePdfAPH implements BasePdfGenerator{
         try {
             currDir = ""+new java.io.File(".").getCanonicalPath();
             paperDir = currDir + "\\\\" + "PAPER\\\\";
+            dirFonts = currDir + "\\\\" + "FONTS\\\\";
         } catch (IOException ex) {
             Logger.getLogger(CreatePdfAPH.class.getName()).log(Level.SEVERE, null, ex);
         }

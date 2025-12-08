@@ -52,7 +52,7 @@ public class Processing {
         String cycle = params[5];
         setCurrentDirectory(""+ new java.io.File(".").getCanonicalPath(), product, cycle);
         String[] dirParams = {readyToPrintCyPrintDirectory, readyToPrintCyReportDirectory, readyToPrintCySortingDirectory,
-                                readyToPrintCyLogDirectory};
+                                readyToPrintCyLogDirectory, directoryFont};
         
         setDirectory(currentDirectory);
         

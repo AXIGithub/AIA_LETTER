@@ -34,13 +34,15 @@ public class DbfConverter {
             for (int i = 0; i < numberOfFields; i++) {
                 writer.write(reader.getField(i).getName());
                 if (i < numberOfFields - 1) writer.write("\t");
+                System.out.print(reader.getField(i).getName());
             }
             writer.newLine();
 
             Object[] row;
             while ((row = reader.nextRecord()) != null) {
-
+                System.out.println("ROW : " + row);
                 for (int i = 0; i < row.length; i++) {
+                    System.out.println(row[i].toString().trim());
                     writer.write(row[i] != null ? row[i].toString().trim() : "");
                     if (i < row.length - 1) writer.write("\t");
                 }
@@ -48,6 +50,7 @@ public class DbfConverter {
             }
             
         } catch (Exception e) {
+            System.out.println("Error convert");
             e.printStackTrace();
         }
         return outputPath;
