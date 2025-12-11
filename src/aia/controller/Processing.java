@@ -67,8 +67,8 @@ public class Processing {
     private void process(String path, String product, String[] pathOutput){
         try {
             List<PolisModel> allData = readerService.readFromText(path);
-            for(PolisModel data : allData){
-                BasePdfGenerator generator = LetterFactory.getPdfTemplate(product);
+            BasePdfGenerator generator = LetterFactory.getPdfTemplate(product);
+            for(PolisModel data : allData){                
                 generator.generate(data, product,pathOutput);
             }
             
