@@ -317,10 +317,4 @@ public class PolisModel {
     public void setDte_birth(String dte_birth) {
         this.dte_birth = dte_birth;
     }
-    
-
-    
-    
-    
-    
 }

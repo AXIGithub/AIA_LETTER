@@ -27,9 +27,7 @@ public class TextReaderService {
         while((line = br.readLine()) != null){
             String[] c = line.split("\t");
             
-            PolisModel model = new PolisModel();
-            model.setChdrnum(c[0]);
-            model.setCnttype(c[1]);
+            PolisModel model = new PolisModel();          
             model.setChdrnum(c[0]);
             model.setCnttype(c[1]);
             model.setOwner(c[2]);
