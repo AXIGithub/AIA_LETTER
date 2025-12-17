@@ -9,7 +9,7 @@ package aia.model;
  *
  * @author Ratino
  */
-public class EpmlModel {
+public class EpmlModel extends BaseModel{
     private String clientNum;
     private String owner;
     private String alamat1;
