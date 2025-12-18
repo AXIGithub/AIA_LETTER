@@ -7,7 +7,8 @@ package aia.poa_product;
 
 import aia.controller.BasePdfGenerator;
 import aia.controller.TextModification;
-import aia.model.PolisModel;
+import aia.model.AphModel;
+import aia.model.BaseModel;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
@@ -54,14 +55,24 @@ public class CreatePdfAPH implements BasePdfGenerator{
     
     
     
-
     @Override
-    public void generate(PolisModel polisModel, String product, String[] params) throws Exception {
+    public void generate(BaseModel baseModel, String product, String[] params) throws Exception {
+        if(!(baseModel instanceof AphModel)){
+            throw new IllegalArgumentException("Not Aph Model");
+        }
+        
+        AphModel model = (AphModel) baseModel;
+        yAddr = 712;
+        xAddr = 72;
+        yInfo = 717;
+        xInfo = 296;
+        xDot = 430;
+        xDataInfo = 437;
         sortingDir = params[2];
         getCurrentDir();
         Document document = new Document(PageSize.A4);
         PdfWriter writer = PdfWriter.getInstance(document,
-                new FileOutputStream(sortingDir + product + "_" + polisModel.getChdrnum() + ".pdf"));
+                new FileOutputStream(sortingDir + product + "_" + model.getChrdnum()+ ".pdf"));
         
         dataReaderPreprinted = new PdfReader(paperDir + "PAPER AIA.pdf");
 
@@ -87,21 +98,21 @@ public class CreatePdfAPH implements BasePdfGenerator{
         canvas.showTextAligned(Element.ALIGN_LEFT, "Kepada yang terhormat :", xAddr, yAddr, 0);
         yAddr = (float) (yAddr - 10);
         canvas.setFontAndSize(arialBold, 9);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "Bapak/Ibu " + polisModel.getOwner(), xAddr, yAddr, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, "Bapak/Ibu " + model.getOwner(), xAddr, yAddr, 0);
         yAddr = (float) (yAddr - 10);
         canvas.setFontAndSize(arial, 10);
-        canvas.showTextAligned(Element.ALIGN_LEFT, polisModel.getAlamat1(), xAddr, yAddr, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, model.getAlamat1(), xAddr, yAddr, 0);
         yAddr = (float) (yAddr - 10);
-        canvas.showTextAligned(Element.ALIGN_LEFT, polisModel.getAlamat2()+ " " + polisModel.getAlamat3(), xAddr, yAddr, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, model.getAlamat2()+ " " + model.getAlamat3(), xAddr, yAddr, 0);
         yAddr = (float) (yAddr - 10);
-        canvas.showTextAligned(Element.ALIGN_LEFT, polisModel.getAlamat4()+ " " + polisModel.getAlamat5(), xAddr, yAddr, 0);
-
-        // ================= INFO POLIS =====================
-        // No Polis
+        canvas.showTextAligned(Element.ALIGN_LEFT, model.getAlamat4()+ " " + model.getAlamat5(), xAddr, yAddr, 0);
+//
+//        // ================= INFO POLIS =====================
+//        // No Polis
         canvas.showTextAligned(Element.ALIGN_LEFT, "No. Polis", xInfo, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
         canvas.setFontAndSize(arialBold, 9);
-        canvas.showTextAligned(Element.ALIGN_LEFT, polisModel.getChdrnum(), xDataInfo, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, model.getChrdnum(), xDataInfo, yInfo, 0);
         yInfo -= 10;
 
         // Nama Produk
@@ -109,7 +120,7 @@ public class CreatePdfAPH implements BasePdfGenerator{
         canvas.showTextAligned(Element.ALIGN_LEFT, "Nama Produk", xInfo, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
         canvas.setFontAndSize(helvaticaBold, 9);
-        canvas.showTextAligned(Element.ALIGN_LEFT, polisModel.getProd_name(), xDataInfo, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, model.getProdName(), xDataInfo, yInfo, 0);
         yInfo -= 10;
 
         // Nama Tertanggung
@@ -117,7 +128,7 @@ public class CreatePdfAPH implements BasePdfGenerator{
         canvas.showTextAligned(Element.ALIGN_LEFT, "Nama Tertanggung", xInfo, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
         canvas.setFontAndSize(helvaticaBold, 9);
-        canvas.showTextAligned(Element.ALIGN_LEFT, polisModel.getOwner(), xDataInfo, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, model.getOwner(), xDataInfo, yInfo, 0);
         yInfo -= 10;
 
         // Tanggal Mulai Asuransi
@@ -125,7 +136,7 @@ public class CreatePdfAPH implements BasePdfGenerator{
         canvas.showTextAligned(Element.ALIGN_LEFT, "Tanggal Mulai Asuransi", xInfo, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
         canvas.setFontAndSize(arialBold, 9);
-        canvas.showTextAligned(Element.ALIGN_LEFT, polisModel.getPtdate(), xDataInfo, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, model.getPtdate(), xDataInfo, yInfo, 0);
         yInfo -= 10;
 
         // Premi / Kontribusi
@@ -133,12 +144,12 @@ public class CreatePdfAPH implements BasePdfGenerator{
         canvas.showTextAligned(Element.ALIGN_LEFT, "Premi/Kontribusi", xInfo, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
         canvas.setFontAndSize(arialBold, 9);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "Rp " + polisModel.getSinstamt(), xDataInfo, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, "Rp " + model.getSinstamt(), xDataInfo, yInfo, 0);
         yInfo -= 10;
 
         // Periode Bayar
         canvas.setFontAndSize(arial, 9);
-        String periode = polisModel.getBillfreq().equals("12") ? "Bulanan" : polisModel.getBillfreq();
+        String periode = model.getBillfreq().equals("12") ? "Bulanan" : model.getBillfreq();
         canvas.showTextAligned(Element.ALIGN_LEFT, "Periode Bayar", xInfo, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
         canvas.setFontAndSize(arialBold, 9);
@@ -158,7 +169,7 @@ public class CreatePdfAPH implements BasePdfGenerator{
         canvas.showTextAligned(Element.ALIGN_LEFT, "Tanggal Cetak", xInfo, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
         canvas.setFontAndSize(arialBold, 9);
-        canvas.showTextAligned(Element.ALIGN_LEFT, txt.convertDateMM(polisModel.getChdrdue()) , xDataInfo, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, txt.convertDateMM(model.getChdrdue()) , xDataInfo, yInfo, 0);
         yInfo -= 10;
 
 
@@ -167,7 +178,7 @@ public class CreatePdfAPH implements BasePdfGenerator{
                 "Perihal : Status Polis Cuti Premi/Kontribusi Otomatis", xAddr, 561, 0);
         canvas.setFontAndSize(arialBold, 9);
         canvas.showTextAligned(Element.ALIGN_RIGHT,
-                "Jakarta, " + txt.convertDateMM(polisModel.getChdrdue()) , 544, 561, 0);
+                "Jakarta, " + txt.convertDateMM(model.getChdrdue()) , 544, 561, 0);
         canvas.setFontAndSize(arial, 9);
         
         // ===================== ISI SURAT ==========================
@@ -195,14 +206,14 @@ public class CreatePdfAPH implements BasePdfGenerator{
                 "Terima kasih atas kepercayaan Anda telah memilih PT AIA FINANCIAL (AIA) sebagai penyedia kebutuhan asuransi bagi Anda dan keluarga.\n" + "\n" +
                 
                 "Kami memahami kesibukan Anda sehingga sampai surat ini diterbitkan, kami belum menerima pembayaran Premi/Kontribusi Polis Anda untuk jatuh tempo tanggal "
-                        + txt.convertDateMM(polisModel.getChdrdue())  + " (Tanggal Jatuh Tempo) yang telah melewati Masa Leluasa.\n" + "\n" +
+                        + txt.convertDateMM(model.getChdrdue())  + " (Tanggal Jatuh Tempo) yang telah melewati Masa Leluasa.\n" + "\n" +
                 
                 "Kondisi tersebut di atas menyebabkan status Polis Anda menjadi Cuti Premi/Kontribusi Otomatis dan akan " +
                 "dikenakan biaya (jika ada) sebagaimana diatur dalam Ketentuan Polis. Fasilitas Cuti Premi/Kontribusi Otomatis " +
                 "akan berlaku selama Nilai Akun Polis Anda masih mencukupi. Anda dapat menghentikan Fasilitas Cuti " +
-                "Premi/Kontribusi ini dengan melunasi tunggakan Premi/Kontribusi yang dapat disetorkan ke rekening " + polisModel.getRek_aia() +
-                " atas nama " + polisModel.getVa_owner() + ". " + 
-                "Sebagai informasi tambahan, berdasarkan catatan kami sampai dengan surat ini diterbitkan, terdapat titipan Premi/Kontribusi sebesar Rp" + polisModel.getSacscurbal() +
+                "Premi/Kontribusi ini dengan melunasi tunggakan Premi/Kontribusi yang dapat disetorkan ke rekening " + model.getRekAia()+
+                " atas nama " + model.getVaOwner()+ ". " + 
+                "Sebagai informasi tambahan, berdasarkan catatan kami sampai dengan surat ini diterbitkan, terdapat titipan Premi/Kontribusi sebesar Rp" + model.getSacscurbal() +
                 " pada Polis Anda.\n" + "\n" + 
                 
                 "Apabila Anda telah melakukan pembayaran Premi sebelum Masa Leluasa berakhir silakan menghubungi Customer Care kami agar pembayaran Premi/Kontribusi Anda dapat dibukukan.\n" +
@@ -229,5 +240,6 @@ public class CreatePdfAPH implements BasePdfGenerator{
             Logger.getLogger(CreatePdfAPH.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+
     
 }

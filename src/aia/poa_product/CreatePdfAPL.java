@@ -7,6 +7,7 @@ package aia.poa_product;
 
 import aia.controller.BasePdfGenerator;
 import aia.controller.TextModification;
+import aia.model.BaseModel;
 import aia.model.PolisModel;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Element;
@@ -46,7 +47,6 @@ public class CreatePdfAPL implements BasePdfGenerator{
     
     
 
-    @Override
     public void generate(PolisModel polisModel, String product, String[] params) throws Exception {
         getCurrentDir();
         Document document = new Document(PageSize.A4);
@@ -197,6 +197,11 @@ public class CreatePdfAPL implements BasePdfGenerator{
         } catch (IOException ex) {
             Logger.getLogger(CreatePdfAPL.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    @Override
+    public void generate(BaseModel baseModel, String Product, String[] params) throws Exception {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
 }

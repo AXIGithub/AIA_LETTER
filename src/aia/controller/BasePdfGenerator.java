@@ -5,6 +5,7 @@
  */
 package aia.controller;
 
+import aia.model.BaseModel;
 import aia.model.PolisModel;
 
 /**
@@ -12,5 +13,5 @@ import aia.model.PolisModel;
  * @author Ratino
  */
 public interface BasePdfGenerator {
-    void generate(PolisModel polisModel, String Product, String[] params) throws Exception;
+    void generate(BaseModel baseModel, String Product, String[] params) throws Exception;
 }

@@ -5,6 +5,7 @@
  */
 package aia.controller;
 
+import aia.model.BaseModel;
 import aia.model.PolisModel;
 import com.itextpdf.text.DocumentException;
 import com.linuxense.javadbf.DBFException;
@@ -66,9 +67,10 @@ public class Processing {
     
     private void process(String path, String product, String[] pathOutput){
         try {
-            List<PolisModel> allData = readerService.readFromText(path);
+            
+            List<BaseModel> allData = readerService.readFromText(path, product);
             BasePdfGenerator generator = LetterFactory.getPdfTemplate(product);
-            for(PolisModel data : allData){                
+            for(BaseModel data : allData){                
                 generator.generate(data, product,pathOutput);
             }
             

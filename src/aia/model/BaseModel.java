@@ -11,6 +11,8 @@ package aia.model;
  */
 public class BaseModel {
     private String chrdnum;
+    private String cnttype;
+    
 
     public String getChrdnum() {
         return chrdnum;
@@ -19,6 +21,8 @@ public class BaseModel {
     public void setChrdnum(String chrdnum) {
         this.chrdnum = chrdnum;
     }
+
+    
     
     
 }
