@@ -5,7 +5,7 @@
  */
 package aia.model.parser;
 
-import aia.model.AphModel;
+import aia.model.productMapping.AphModel;
 import aia.model.BaseModel;
 
 /**

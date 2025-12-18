@@ -6,7 +6,7 @@
 package aia.model.parser;
 
 import aia.model.BaseModel;
-import aia.model.EpmlModel;
+import aia.model.productMapping.EpmlModel;
 
 /**
  *

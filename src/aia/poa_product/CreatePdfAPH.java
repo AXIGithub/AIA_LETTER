@@ -7,7 +7,7 @@ package aia.poa_product;
 
 import aia.controller.BasePdfGenerator;
 import aia.controller.TextModification;
-import aia.model.AphModel;
+import aia.model.productMapping.AphModel;
 import aia.model.BaseModel;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Element;
