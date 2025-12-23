@@ -37,7 +37,7 @@ public class BTLCRModel extends BaseModel{
    private String caraBayar;
    private String terbilang;
    private String cabLl;
-   private String uploadDate;
+   private String dtUpload;
    private String agentName;
    private String fundCurr;
    private String flgSyariah;
@@ -253,12 +253,12 @@ public class BTLCRModel extends BaseModel{
         this.cabLl = cabLl;
     }
 
-    public String getUploadDate() {
-        return uploadDate;
+    public String getDtUpload() {
+        return dtUpload;
     }
 
-    public void setUploadDate(String uploadDate) {
-        this.uploadDate = uploadDate;
+    public void setDtUpload(String dtUpload) {
+        this.dtUpload = dtUpload;
     }
 
     public String getAgentName() {

@@ -72,7 +72,7 @@ public class CreatePdfAPH implements BasePdfGenerator{
         getCurrentDir();
         Document document = new Document(PageSize.A4);
         PdfWriter writer = PdfWriter.getInstance(document,
-                new FileOutputStream(sortingDir + product + "_" + model.getChrdnum()+ ".pdf"));
+                new FileOutputStream(sortingDir + product + "_" + model.getChdrnum()+ ".pdf"));
         
         dataReaderPreprinted = new PdfReader(paperDir + "PAPER AIA.pdf");
 
@@ -112,7 +112,7 @@ public class CreatePdfAPH implements BasePdfGenerator{
         canvas.showTextAligned(Element.ALIGN_LEFT, "No. Polis", xInfo, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
         canvas.setFontAndSize(arialBold, 9);
-        canvas.showTextAligned(Element.ALIGN_LEFT, model.getChrdnum(), xDataInfo, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, model.getChdrnum(), xDataInfo, yInfo, 0);
         yInfo -= 10;
 
         // Nama Produk

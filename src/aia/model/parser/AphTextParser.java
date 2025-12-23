@@ -17,7 +17,7 @@ public class AphTextParser implements BaseTextParserInterface{
     @Override
     public BaseModel parse(String[] c) {
         AphModel model = new AphModel();
-        model.setChrdnum(c[0]);
+        model.setChdrnum(c[0]);
         model.setCnttype(c[1]);
         model.setOwner(c[2]);
         model.setAlamat1(c[3]);

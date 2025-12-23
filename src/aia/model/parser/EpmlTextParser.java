@@ -17,7 +17,7 @@ public class EpmlTextParser implements BaseTextParserInterface{
     @Override
     public BaseModel parse(String[] c) {
         EpmlModel model = new EpmlModel();
-         model.setChrdnum(c[0]);
+         model.setChdrnum(c[0]);
          model.setClientNum(c[1]);
          model.setOwner(c[2]);
          model.setAlamat1(c[3]);
