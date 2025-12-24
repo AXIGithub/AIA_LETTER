@@ -3,15 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package aia.controller;
+package aia.model.parser;
 
 import aia.model.BaseModel;
-import aia.model.PolisModel;
 
 /**
  *
  * @author Ratino
  */
-public interface BasePdfGenerator {
-    void generate(BaseModel baseModel, String Product, String[] params) throws Exception;
+public interface BaseTextParserInterface {
+    BaseModel parse(String[] columns);
 }

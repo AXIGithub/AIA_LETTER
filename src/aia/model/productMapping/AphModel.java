@@ -3,14 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package aia.model;
+package aia.model.productMapping;
+
+import aia.model.BaseModel;
 
 /**
  *
  * @author Ratino
  */
-public class PolisModel {
-    private String chdrnum;
+public class AphModel extends BaseModel {
     private String cnttype;
     private String owner;
     private String alamat1;
@@ -19,7 +20,6 @@ public class PolisModel {
     private String alamat4;
     private String alamat5;
     private String cltpcode;
-
     private String name;
     private String sinstamt;
     private String cntcurr;
@@ -28,31 +28,23 @@ public class PolisModel {
     private String chdrdue;
     private String srcebus;
     private String zmrktcd;
-    private String prod_name;
-    private String flgsyariah;
+    private String prodName;
+    private String flgSyariah;
     private String sacscurbal;
     private String occdate;
     private String statcode;
     private String zservstat;
-    private String topup_vi;
-    private String cab_lb;
+    private String topupVi;
+    private String cabLb;
     private String terbilang;
     private String fldent;
     private String ybankkey;
     private String ysustyp;
-    private String rek_aia;
-    private String va_owner;
-    private String flg_estate;
-    private String cltemail;    
-    private String dte_birth;
-
-    public String getChdrnum() {
-        return chdrnum;
-    }
-
-    public void setChdrnum(String chdrnum) {
-        this.chdrnum = chdrnum;
-    }
+    private String rekAia;
+    private String vaOwner;
+    private String flgEstate;
+    private String cltEmail;
+    private String dteBirth;
 
     public String getCnttype() {
         return cnttype;
@@ -182,20 +174,20 @@ public class PolisModel {
         this.zmrktcd = zmrktcd;
     }
 
-    public String getProd_name() {
-        return prod_name;
+    public String getProdName() {
+        return prodName;
     }
 
-    public void setProd_name(String prod_name) {
-        this.prod_name = prod_name;
+    public void setProdName(String prodName) {
+        this.prodName = prodName;
     }
 
-    public String getFlgsyariah() {
-        return flgsyariah;
+    public String getFlgSyariah() {
+        return flgSyariah;
     }
 
-    public void setFlgsyariah(String flgsyariah) {
-        this.flgsyariah = flgsyariah;
+    public void setFlgSyariah(String flgSyariah) {
+        this.flgSyariah = flgSyariah;
     }
 
     public String getSacscurbal() {
@@ -230,20 +222,20 @@ public class PolisModel {
         this.zservstat = zservstat;
     }
 
-    public String getTopup_vi() {
-        return topup_vi;
+    public String getTopupVi() {
+        return topupVi;
     }
 
-    public void setTopup_vi(String topup_vi) {
-        this.topup_vi = topup_vi;
+    public void setTopupVi(String topupVi) {
+        this.topupVi = topupVi;
     }
 
-    public String getCab_lb() {
-        return cab_lb;
+    public String getCabLb() {
+        return cabLb;
     }
 
-    public void setCab_lb(String cab_lb) {
-        this.cab_lb = cab_lb;
+    public void setCabLb(String cabLb) {
+        this.cabLb = cabLb;
     }
 
     public String getTerbilang() {
@@ -278,43 +270,47 @@ public class PolisModel {
         this.ysustyp = ysustyp;
     }
 
-    public String getRek_aia() {
-        return rek_aia;
+    public String getRekAia() {
+        return rekAia;
     }
 
-    public void setRek_aia(String rek_aia) {
-        this.rek_aia = rek_aia;
+    public void setRekAia(String rekAia) {
+        this.rekAia = rekAia;
     }
 
-    public String getVa_owner() {
-        return va_owner;
+    public String getVaOwner() {
+        return vaOwner;
     }
 
-    public void setVa_owner(String va_owner) {
-        this.va_owner = va_owner;
+    public void setVaOwner(String vaOwner) {
+        this.vaOwner = vaOwner;
     }
 
-    public String getFlg_estate() {
-        return flg_estate;
+    public String getFlgEstate() {
+        return flgEstate;
     }
 
-    public void setFlg_estate(String flg_estate) {
-        this.flg_estate = flg_estate;
+    public void setFlgEstate(String flgEstate) {
+        this.flgEstate = flgEstate;
     }
 
-    public String getCltemail() {
-        return cltemail;
+    public String getCltEmail() {
+        return cltEmail;
     }
 
-    public void setCltemail(String cltemail) {
-        this.cltemail = cltemail;
+    public void setCltEmail(String cltEmail) {
+        this.cltEmail = cltEmail;
     }
 
-    public String getDte_birth() {
-        return dte_birth;
+    public String getDteBirth() {
+        return dteBirth;
     }
 
-    public void setDte_birth(String dte_birth) {
-        this.dte_birth = dte_birth;
+    public void setDteBirth(String dteBirth) {
+        this.dteBirth = dteBirth;
     }
+    
+    
+    
+    
 }

@@ -7,7 +7,10 @@ package aia.poa_product;
 
 import aia.controller.BasePdfGenerator;
 import aia.controller.TextModification;
+import aia.model.BaseModel;
 import aia.model.PolisModel;
+import aia.model.productMapping.AphModel;
+import aia.model.productMapping.BTLCRModel;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Element;
@@ -61,12 +64,17 @@ public class CreatePdfBTLCR implements BasePdfGenerator{
     
 
     @Override
-    public void generate(PolisModel polisModel, String product, String[] params) throws Exception {
+    public void generate(BaseModel baseModel, String product, String[] params) throws Exception {
+        if(!(baseModel instanceof BTLCRModel)){
+            throw new IllegalArgumentException("Not Aph Model");
+        }
+        
+        BTLCRModel model =  (BTLCRModel) baseModel;
         sortingDir = params[2];
         getCurrentDir();
         Document document = new Document(PageSize.A4);
         PdfWriter writer = PdfWriter.getInstance(document,
-                new FileOutputStream(sortingDir + product + "_" + polisModel.getChdrnum() + ".pdf"));
+                new FileOutputStream(sortingDir + product + "_" + model.getChdrnum() + ".pdf"));
         
         dataReaderPreprinted = new PdfReader(paperDir + "PAPER AIA.pdf");
 
@@ -145,7 +153,7 @@ public class CreatePdfBTLCR implements BasePdfGenerator{
 
         // Periode Bayar
         canvas.setFontAndSize(arial, 8.5f);
-        String periode = polisModel.getBillfreq().equals("12") ? "Bulanan" : polisModel.getBillfreq();
+        String periode = model.getBillfreq().equals("12") ? "Bulanan" : model.getBillfreq();
         canvas.showTextAligned(Element.ALIGN_LEFT, "Periode Bayar", xInfo, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
         canvas.setFontAndSize(arialBold, 8.5f);

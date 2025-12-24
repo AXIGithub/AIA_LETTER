@@ -3,15 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package aia.controller;
-
-import aia.model.BaseModel;
-import aia.model.PolisModel;
+package aia.model.productMapping;
 
 /**
  *
  * @author Ratino
  */
-public interface BasePdfGenerator {
-    void generate(BaseModel baseModel, String Product, String[] params) throws Exception;
+public class MapmModel extends MamaModel{
+//    Tinggal ambil aja bro dari Mama Model/ Kolom2 nya sama, hanya saja mamp lebih sedikit
 }
