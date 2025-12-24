@@ -28,7 +28,7 @@ import java.util.logging.Logger;
  *
  * @author Ratino
  */
-public class CreatePdfAPH implements BasePdfGenerator{
+public class CreatePdfLANF implements BasePdfGenerator{
     
     TextModification txt = new TextModification();
     private PdfReader dataReaderPreprinted = null;
@@ -86,98 +86,20 @@ public class CreatePdfAPH implements BasePdfGenerator{
         canvas.setFontAndSize(arial, 9.5f);
 
         // ================= HEADER =======================
-        canvas.showTextAligned(Element.ALIGN_LEFT, "Kepada yang terhormat :", xAddr, yAddr, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, "Kepada Yth :", xAddr, yAddr, 0);
         yAddr = (float) (yAddr - 10);
-//        canvas.setFontAndSize(arial, (float)9.5);
         canvas.setFontAndSize(arialBold, 9.5f);
-        
-        String owner = polisModel.getOwner(); 
-        String owner1 = owner;
-        String owner2 = "";
-        
-        String[] split = owner.split(" "); 
-        
-        if (owner.length() > 25) {
-            StringBuilder sb1 = new StringBuilder();
-            StringBuilder sb2 = new StringBuilder();
-
-            for (int i = 0; i < split.length; i++) {
-                if (i <= 1) { 
-                    sb1.append(split[i]).append(" ");
-                } else {
-                    sb2.append(split[i]).append(" ");
-                }
-            }
-
-            owner1 = sb1.toString().trim();
-            owner2 = sb2.toString().trim();
-        }
-
-        
-        canvas.showTextAligned(Element.ALIGN_LEFT, "Bapak/Ibu " + owner1, xAddr, yAddr, 0);
-        yAddr -= 10;
-        
-        if (!owner2.isEmpty()) {
-            canvas.showTextAligned(Element.ALIGN_LEFT, owner2, xAddr, yAddr, 0);
-            yAddr -= 10;
-        }
-
-//        canvas.showTextAligned(Element.ALIGN_LEFT, "Bapak/Ibu " + polisModel.getOwner(), xAddr, yAddr, 0);
-//        yAddr = (float) (yAddr - 10);
-//        canvas.setFontAndSize(arial, (float)9.5);
-//        canvas.showTextAligned(Element.ALIGN_LEFT, polisModel.getAlamat1(), xAddr, yAddr, 0);
-//        yAddr = (float) (yAddr - 10);
-//        canvas.showTextAligned(Element.ALIGN_LEFT, polisModel.getAlamat2()+ " " + polisModel.getAlamat3(), xAddr, yAddr, 0);
-//        yAddr = (float) (yAddr - 10);
-//        canvas.showTextAligned(Element.ALIGN_LEFT, polisModel.getAlamat4()+ " " + polisModel.getAlamat5(), xAddr, yAddr, 0);
-
-
+        canvas.showTextAligned(Element.ALIGN_LEFT, "Bapak/Ibu [OWNER]", xAddr, yAddr, 0);
+        yAddr = (float) (yAddr - 10);
         canvas.setFontAndSize(arial, 9.5f);
-        boolean allFull =
-                !polisModel.getAlamat1().trim().isEmpty() &&
-                !polisModel.getAlamat2().trim().isEmpty() &&
-                !polisModel.getAlamat3().trim().isEmpty() &&
-                !polisModel.getAlamat4().trim().isEmpty() &&
-                !polisModel.getAlamat5().trim().isEmpty();
+        canvas.showTextAligned(Element.ALIGN_LEFT, "[alamat1]", xAddr, yAddr, 0);
+        yAddr = (float) (yAddr - 10);
+        canvas.showTextAligned(Element.ALIGN_LEFT,"[alamat2]" + " " + "[alamat3]", xAddr, yAddr, 0);
+        yAddr = (float) (yAddr - 10);
+        canvas.showTextAligned(Element.ALIGN_LEFT, "[alamat4]" + " " + "[alamat5]", xAddr, yAddr, 0);
+        yAddr = (float) (yAddr - 10);
+        canvas.showTextAligned(Element.ALIGN_LEFT, "[kodePos]", xAddr, yAddr, 0);
 
-        if (allFull) {
-//            canvas.showTextAligned(Element.ALIGN_LEFT, polisModel.getAlamat4(), xAddr, yAddr, 0);
-//            yAddr -= 10;
-//            canvas.showTextAligned(Element.ALIGN_LEFT, polisModel.getAlamat5(), xAddr, yAddr, 0);
-//            yAddr -= 10;
-              
-                String[] lines = {
-                    polisModel.getAlamat1(),
-                    polisModel.getAlamat2(),
-                    polisModel.getAlamat3(),
-                    polisModel.getAlamat4(),
-                    polisModel.getAlamat5(),
-                    polisModel.getCltpcode()
-                };
-
-                for (String line : lines) {
-                    if (line != null && !line.trim().isEmpty()) {
-                        canvas.showTextAligned(Element.ALIGN_LEFT, line, xAddr, yAddr, 0);
-                        yAddr -= 10;
-                    }
-                }
-                
-        } else {
-            String alamat23 = (polisModel.getAlamat2() == null || polisModel.getAlamat2().trim().isEmpty())
-                ? polisModel.getAlamat3()
-                : polisModel.getAlamat2() + " " + polisModel.getAlamat3();
-            String alamat45 = (polisModel.getAlamat4() == null || polisModel.getAlamat4().trim().isEmpty())
-                ? polisModel.getAlamat5()
-                : polisModel.getAlamat4() + " " + polisModel.getAlamat5();
-
-            canvas.showTextAligned(Element.ALIGN_LEFT, polisModel.getAlamat1(), xAddr, yAddr, 0);
-            yAddr -= 10;
-            canvas.showTextAligned(Element.ALIGN_LEFT, alamat23, xAddr, yAddr, 0);
-            yAddr -= 10;
-            canvas.showTextAligned(Element.ALIGN_LEFT, alamat45, xAddr, yAddr, 0);
-            yAddr -= 10;
-            canvas.showTextAligned(Element.ALIGN_LEFT, polisModel.getCltpcode(), xAddr, yAddr, 0);
-        }
         
         
         // ================= INFO POLIS =====================
@@ -185,7 +107,7 @@ public class CreatePdfAPH implements BasePdfGenerator{
         canvas.showTextAligned(Element.ALIGN_LEFT, "No. Polis", xInfo, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
         canvas.setFontAndSize(arialBold, 9.5f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, polisModel.getChdrnum(), xDataInfo, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, "[noPolis]", xDataInfo, yInfo, 0);
         yInfo -= 12.5f;
 
         // Nama Produk
@@ -193,50 +115,49 @@ public class CreatePdfAPH implements BasePdfGenerator{
         canvas.showTextAligned(Element.ALIGN_LEFT, "Nama Produk", xInfo, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
         canvas.setFontAndSize(arialBold, 9.5f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, polisModel.getProd_name(), xDataInfo, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, "[namaProduk]", xDataInfo, yInfo, 0);
         yInfo -= 12.5f;
 
-        // Nama Tertanggung
+        // Mata Uang
         canvas.setFontAndSize(arial, 9.5f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "Nama Tertanggung", xInfo, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, "Mata Uang", xInfo, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
-
         canvas.setFontAndSize(arialBold, 9.5f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, polisModel.getName(), xDataInfo, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, "[mataUang]", xDataInfo, yInfo, 0);
         yInfo -= 12.5f;
 
+
+        // Uang Pertanggungan Dasar 
+        canvas.setFontAndSize(arial, 9.5f);
+        canvas.showTextAligned(Element.ALIGN_LEFT, "Uang Pertanggungan Dasar", xInfo, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
+        canvas.setFontAndSize(arialBold, 9.5f);
+        canvas.showTextAligned(Element.ALIGN_LEFT, "[uangPertanggungan]", xDataInfo, yInfo, 0);
+        yInfo -= 12.5f;
+
+        // Jumlah Premi / Kontribusi
+        canvas.setFontAndSize(arial, 9.5f);
+        canvas.showTextAligned(Element.ALIGN_LEFT, "Jumlah Premi/Kontribusi", xInfo, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
+        canvas.setFontAndSize(arialBold, 9.5f);
+        canvas.showTextAligned(Element.ALIGN_LEFT, "Rp" + "[jumlahPremi]", xDataInfo, yInfo, 0);
+        yInfo -= 12.5f;
+
+        // Cara Bayar
+        canvas.setFontAndSize(arial, 9.5f);
+        String periode = polisModel.getBillfreq().equals("12") ? "Bulanan" : "Tahunan";
+        canvas.showTextAligned(Element.ALIGN_LEFT, "Cara Bayar", xInfo, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
+        canvas.setFontAndSize(arialBold, 9.5f);
+        canvas.showTextAligned(Element.ALIGN_LEFT, "[caraBayar]", xDataInfo, yInfo, 0);
+        yInfo -= 12.5f;
 
         // Tanggal Mulai Asuransi
         canvas.setFontAndSize(arial, 9.5f);
         canvas.showTextAligned(Element.ALIGN_LEFT, "Tanggal Mulai Asuransi", xInfo, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
         canvas.setFontAndSize(arialBold, 9.5f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, txt.convertDateMM(polisModel.getPtdate()), xDataInfo, yInfo, 0);
-        yInfo -= 12.5f;
-
-        // Premi / Kontribusi
-        canvas.setFontAndSize(arial, 9.5f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "Premi/Kontribusi", xInfo, yInfo, 0);
-        canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
-        canvas.setFontAndSize(arialBold, 9.5f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "Rp" + txt.setCurrencyIdr(polisModel.getSinstamt()), xDataInfo, yInfo, 0);
-        yInfo -= 12.5f;
-
-        // Periode Bayar
-        canvas.setFontAndSize(arial, 9.5f);
-        String periode = polisModel.getBillfreq().equals("12") ? "Bulanan" : "Tahunan";
-        canvas.showTextAligned(Element.ALIGN_LEFT, "Periode Bayar", xInfo, yInfo, 0);
-        canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
-        canvas.setFontAndSize(arialBold, 9.5f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, periode, xDataInfo, yInfo, 0);
-        yInfo -= 12.5f;
-
-        // Status Polis
-        canvas.setFontAndSize(arial, 9.5f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "Status Polis", xInfo, yInfo, 0);
-        canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
-        canvas.setFontAndSize(arialBold, 9.5f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "Aktif", xDataInfo, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, "[tanggalMulai]", xDataInfo, yInfo, 0);
         yInfo -= 12.5f;
 
         // Tanggal Cetak
@@ -244,22 +165,21 @@ public class CreatePdfAPH implements BasePdfGenerator{
         canvas.showTextAligned(Element.ALIGN_LEFT, "Tanggal Cetak", xInfo, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
         canvas.setFontAndSize(arialBold, 9.5f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, txt.convertDateMM(polisModel.getChdrdue()) , xDataInfo, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, "[tanggalCetak]" , xDataInfo, yInfo, 0);
         yInfo -= 12.5f;
 
 
         // ========== PERIHAL ===========================
-        canvas.showTextAligned(Element.ALIGN_LEFT,
-                "Perihal : Status Polis Cuti Premi/Kontribusi Otomatis", xAddr, 561, 0);
         canvas.setFontAndSize(arialBold, 9.5f);
-        canvas.showTextAligned(Element.ALIGN_RIGHT,
-                "Jakarta, " + txt.convertDateMM(polisModel.getChdrdue()) , 544, 561, 0);
-        canvas.setFontAndSize(arial, 9.5f);
+        canvas.showTextAligned(Element.ALIGN_LEFT,
+                "PRIBADI DAN RAHASIA" , xAddr, 561, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT,
+                "Perihal : Status Polis Cuti Premi/Kontribusi Otomatis", xAddr, 551, 0);
         canvas.endText();
         
         // ===================== ISI SURAT ==========================
 
-        int topY = 550;   // posisi atas kolom
+        int topY = 540;   // posisi atas kolom
         int bottomY = 50; // posisi bawah kolom   
         int rightX = 545; // Posisi kanan kolom
 
@@ -297,7 +217,7 @@ public class CreatePdfAPH implements BasePdfGenerator{
             paperDir = currDir + "\\\\" + "PAPER\\\\";
             dirFonts = currDir + "\\\\" + "FONTS\\\\";
         } catch (IOException ex) {
-            Logger.getLogger(CreatePdfAPH.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CreatePdfLANF.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     

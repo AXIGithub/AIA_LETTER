@@ -52,7 +52,7 @@ public class Processing {
         String cycle = params[5];
         setCurrentDirectory(""+ new java.io.File(".").getCanonicalPath(), product, cycle);
         String[] dirParams = {readyToPrintCyPrintDirectory, readyToPrintCyReportDirectory, readyToPrintCySortingDirectory,
-                                readyToPrintCyLogDirectory};
+                                readyToPrintCyLogDirectory, directoryFont};
         
         setDirectory(currentDirectory);
         
@@ -69,7 +69,7 @@ public class Processing {
             List<PolisModel> allData = readerService.readFromText(path);
             for(PolisModel data : allData){
                 BasePdfGenerator generator = LetterFactory.getPdfTemplate(product);
-                generator.generate(data, product,pathOutput);
+                generator.generate(data, product, pathOutput);
             }
             
         } catch (Exception ex) {

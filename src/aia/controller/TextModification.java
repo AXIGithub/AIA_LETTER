@@ -516,6 +516,11 @@ private static final String[] ANGKA = {"", "satu", "dua", "tiga", "empat", "lima
     }
 
     public String setCurrencyIdr(String value){
+        if(value.startsWith("-")){
+            value = value.substring(1);
+        }
+        
+        value = value.replace(".", ",");
         boolean statusKoma = false;
         String decimal = new String();
         if(value.indexOf(",")>-1){
@@ -544,6 +549,7 @@ private static final String[] ANGKA = {"", "satu", "dua", "tiga", "empat", "lima
     }
 
     public String setCurrencyIdr2(String value){
+        value = value.replace(".", ",");
         boolean statusKoma = false;
         String decimal = new String();
         if(value.indexOf(",")>-1){
@@ -1083,52 +1089,119 @@ private static final String[] ANGKA = {"", "satu", "dua", "tiga", "empat", "lima
         }
     }
     
+//    public void writeParagraph(String text, Document document, float left, float bottom, float right, float top, PdfContentByte canvas, BaseFont baseFont, float fontSize, float lineSpacing) {
+//// Rectangle rect = new Rectangle(leftMargin, rightMargin);
+//        // Paragraph p = new Paragraph(text).
+//        Font linkFont = new Font(baseFont, fontSize, Font.UNDERLINE);
+//        Font contentFont = new Font(baseFont, fontSize);
+////        Chunk chunk = new Chunk(text, font);
+////        chunk.setUnderline(0.1f, -2f);
+////        Phrase phrase = new Phrase(text, font);
+//        Phrase phrase = new Phrase();
+//        
+//        Pattern linkPattern = Pattern.compile("(https?://\\S+)");
+//        Matcher matcher = linkPattern.matcher(text);
+//        int lastEnd = 0;
+//        
+//        while (matcher.find()) {
+//            if (matcher.start() > lastEnd) {
+//                String textBefore = text.substring(lastEnd, matcher.start());
+//                phrase.add(new Chunk(textBefore, contentFont));
+//            }
+//
+//            String linkText = matcher.group();
+//            Chunk linkChunk = new Chunk(linkText, linkFont);
+////            linkChunk.setUnderline(0.1f, -2f);
+////            linkChunk.setAnchor(linkText);
+//            phrase.add(linkChunk);
+//
+//            lastEnd = matcher.end();
+//        }
+//        
+//        if (lastEnd < text.length()) {
+//            phrase.add(new Chunk(text.substring(lastEnd), contentFont));
+//        }
+//
+//        ColumnText ct = new ColumnText(canvas);
+//        ct.setSimpleColumn(left, bottom, right, top);
+//        ct.setLeading(0, lineSpacing);
+//        ct.setAlignment(Element.ALIGN_JUSTIFIED);
+//        ct.setText(phrase);
+//        try {
+//            ct.go();
+//        } catch (DocumentException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//        }
+//    }
+    
     public void writeParagraph(String text, Document document, float left, float bottom, float right, float top, PdfContentByte canvas, BaseFont baseFont, float fontSize, float lineSpacing) {
-// Rectangle rect = new Rectangle(leftMargin, rightMargin);
-        // Paragraph p = new Paragraph(text).
+        if (text == null) text = "";
+        
+        Font contentFont = new Font(baseFont, fontSize, Font.NORMAL);
+        Font boldFont = new Font(baseFont, fontSize, Font.BOLD);
         Font linkFont = new Font(baseFont, fontSize, Font.UNDERLINE);
-        Font contentFont = new Font(baseFont, fontSize);
-//        Chunk chunk = new Chunk(text, font);
-//        chunk.setUnderline(0.1f, -2f);
-//        Phrase phrase = new Phrase(text, font);
+        Font italicFont = new Font(baseFont, fontSize, Font.ITALIC);
+        
+        Pattern combined = Pattern.compile(
+            "(\\[b\\](.*?)\\[/b\\])" +       
+            "|(\\[i\\](.*?)\\[/i\\])" +  
+            "|(\\[u\\](.*?)\\[/u\\])" +
+            "|(https?://\\S+)",            
+            Pattern.DOTALL | Pattern.CASE_INSENSITIVE
+        );
+
+        Matcher m = combined.matcher(text);
+
         Phrase phrase = new Phrase();
-        
-        Pattern linkPattern = Pattern.compile("(https?://\\S+)");
-        Matcher matcher = linkPattern.matcher(text);
         int lastEnd = 0;
-        
-        while (matcher.find()) {
-            if (matcher.start() > lastEnd) {
-                String textBefore = text.substring(lastEnd, matcher.start());
-                phrase.add(new Chunk(textBefore, contentFont));
+
+        while (m.find()) {
+            if (m.start() > lastEnd) {
+                String before = text.substring(lastEnd, m.start());
+                if (!before.isEmpty()) {
+                    phrase.add(new Chunk(before, contentFont));
+                }
+            }
+            
+            String boldGroup = m.group(2); 
+            String italicGroup = m.group(4); 
+            String underlineGroup = m.group(6); 
+            String linkGroup = m.group(7); 
+
+            if (boldGroup != null) {
+                phrase.add(new Chunk(boldGroup, boldFont));
+            } else if (italicGroup != null){
+                phrase.add(new Chunk(italicGroup, italicFont));
+            } else if (underlineGroup != null) {
+                Chunk underlineChunk = new Chunk(underlineGroup, contentFont);
+                underlineChunk.setUnderline(1.5f, -2f);
+                phrase.add(underlineChunk);
+            } else if (linkGroup != null) {
+                Chunk linkChunk = new Chunk(linkGroup, linkFont);
+                // Jika ingin membuat clickable link dalam PDF (yang membuka URL), uncomment:
+                // linkChunk.setAnchor(linkGroup);
+                phrase.add(linkChunk);
             }
 
-            String linkText = matcher.group();
-            Chunk linkChunk = new Chunk(linkText, linkFont);
-//            linkChunk.setUnderline(0.1f, -2f);
-//            linkChunk.setAnchor(linkText);
-            phrase.add(linkChunk);
-
-            lastEnd = matcher.end();
+            lastEnd = m.end();
         }
         
         if (lastEnd < text.length()) {
             phrase.add(new Chunk(text.substring(lastEnd), contentFont));
         }
-
+        
         ColumnText ct = new ColumnText(canvas);
         ct.setSimpleColumn(left, bottom, right, top);
+        
         ct.setLeading(0, lineSpacing);
         ct.setAlignment(Element.ALIGN_JUSTIFIED);
         ct.setText(phrase);
+
         try {
             ct.go();
         } catch (DocumentException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
-    
-    
-
 }

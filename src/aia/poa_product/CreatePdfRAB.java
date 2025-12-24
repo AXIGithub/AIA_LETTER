@@ -28,7 +28,7 @@ import java.util.logging.Logger;
  *
  * @author Ratino
  */
-public class CreatePdfACM implements BasePdfGenerator{
+public class CreatePdfRAB implements BasePdfGenerator{
     
     TextModification txt = new TextModification();
     private PdfReader dataReaderPreprinted = null;
@@ -36,6 +36,7 @@ public class CreatePdfACM implements BasePdfGenerator{
     private PdfImportedPage pageData = null;
     
     private BaseFont arial;
+    private BaseFont arialItalic;
     private BaseFont arialUnderline;
     private BaseFont arialBold;    
     private BaseFont barcodeFont;
@@ -51,6 +52,7 @@ public class CreatePdfACM implements BasePdfGenerator{
     private String dirFonts = new String();
     private String sortingDir = new String();
     private String outputDir = new String();
+    
     
     
 
@@ -74,19 +76,20 @@ public class CreatePdfACM implements BasePdfGenerator{
 
         BaseFont helvatica = BaseFont.createFont(BaseFont. HELVETICA, BaseFont.CP1250, BaseFont.NOT_EMBEDDED);
         BaseFont helvaticaBold = BaseFont.createFont(BaseFont. HELVETICA_BOLD, BaseFont.CP1250, BaseFont.NOT_EMBEDDED);
-        
+
         arial = BaseFont.createFont(dirFonts + "Arial.ttf", BaseFont.IDENTITY_H, true);
         arialUnderline = BaseFont.createFont(dirFonts + "ArialUnderline.ttf", BaseFont.IDENTITY_H, true);
         arialBold = BaseFont.createFont(dirFonts + "arial_bold.ttf", BaseFont.IDENTITY_H, true);
+        
         
         canvas.beginText();
         canvas.setFontAndSize(arial, 9.5f);
 
         // ================= HEADER =======================
-        canvas.showTextAligned(Element.ALIGN_LEFT, "Kepada Yth.", xAddr, yAddr, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, "Kepada yang terhormat :", xAddr, yAddr, 0);
         yAddr = (float) (yAddr - 10);
         canvas.setFontAndSize(arialBold, 9.5f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "Bpk/Ibu " + "[AGNTNAME]", xAddr, yAddr, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, "Bapak/Ibu " + "[OWNER]", xAddr, yAddr, 0);
         yAddr = (float) (yAddr - 10);
         canvas.showTextAligned(Element.ALIGN_LEFT, "[ADDRESS1]", xAddr, yAddr, 0);
         yAddr = (float) (yAddr - 10);
@@ -96,36 +99,51 @@ public class CreatePdfACM implements BasePdfGenerator{
         yAddr = (float) (yAddr - 10);
         canvas.showTextAligned(Element.ALIGN_LEFT, "[POSTCODE]", xAddr, yAddr, 0);
         
+        
+        // ================= INFO POLIS =====================
+        // No Polis
+        canvas.showTextAligned(Element.ALIGN_LEFT, "No. Polis", xInfo, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
+        canvas.setFontAndSize(arialBold, 9.5f);
+        canvas.showTextAligned(Element.ALIGN_LEFT, "[noPolis]", xDataInfo, yInfo, 0);
+        yInfo -= 12.5f;
+
+        // Nama Produk
+        canvas.setFontAndSize(arial, 9.5f);
+        canvas.showTextAligned(Element.ALIGN_LEFT, "Nama Produk", xInfo, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
+        canvas.setFontAndSize(arialBold, 9.5f);
+        canvas.showTextAligned(Element.ALIGN_LEFT, "[namaProduk]", xDataInfo, yInfo, 0);
+        yInfo -= 12.5f;
+
+        // Tanggal Cetak
+        canvas.setFontAndSize(arial, 9.5f);
+        canvas.showTextAligned(Element.ALIGN_LEFT, "Tanggal Cetak", xInfo, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
+
+        canvas.setFontAndSize(arialBold, 9.5f);
+        canvas.showTextAligned(Element.ALIGN_LEFT, "[tanggalCetak]", xDataInfo, yInfo, 0);
+        yInfo -= 12.5f;
 
 
         // ========== PERIHAL ===========================
         canvas.showTextAligned(Element.ALIGN_LEFT,
-                "Perihal : Pengakhiran Perjanjian Agen", xAddr, 561, 0);
-        canvas.showTextAligned(Element.ALIGN_RIGHT,
-                "Jakarta, " + "[tanggalCetak]" , 544, 561, 0);
+                "Perihal : Berakhirnya Masa Pembayaran Premi", xAddr, 561, 0);
         canvas.setFontAndSize(arial, 9.5f);
+        canvas.endText();
         
         // ===================== ISI SURAT ==========================
 
         int topY = 550;   // posisi atas kolom
         int bottomY = 50; // posisi bawah kolom   
         int rightX = 545; // Posisi kanan kolom
-        
-        String paragraph = "Dengan Hormat,\n" + "\n" +
-                "Berdasarkan hasil evaluasi yang dilakukan oleh PT AIA FINANCIAL (“Perusahaan”), Perusahaan " +
-                "mencatat bahwa Anda tidak memenuhi ketentuan target yang telah ditetapkan oleh Perusahaan. Maka " +
-                "berdasarkan ketentuan Perjanjian Agen Asuransi yang telah Anda dan Perusahaan tandatangani, " +
-                "Perusahaan berhak dan dengan ini melakukan pengakhiran Perjanjian Agen Asuransi efektif pada " +
-                "tanggal [b][TRMDATE][/b]." + ".\n" ;
-                
-                
 
         
-        txt.writeParagraph(paragraph, document, xAddr, bottomY, rightX, topY, canvas, arial, 9.5f, 1.2f);
-
-        canvas.endText();
-        document.close();
-
+        
+        String paragraph = "Dengan Hormat,\n" + "\n" ;
+        
+            txt.writeParagraph(paragraph, document, xAddr, bottomY, rightX, topY, canvas, arial, 9.5f, 1.2f);
+            document.close();
 
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
@@ -136,7 +154,7 @@ public class CreatePdfACM implements BasePdfGenerator{
             paperDir = currDir + "\\\\" + "PAPER\\\\";
             dirFonts = currDir + "\\\\" + "FONTS\\\\";
         } catch (IOException ex) {
-            Logger.getLogger(CreatePdfAPH.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CreatePdfRAB.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     

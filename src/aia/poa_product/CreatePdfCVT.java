@@ -34,7 +34,7 @@ import java.util.logging.Logger;
  *
  * @author Ratino
  */
-public class CreatePdfACD implements BasePdfGenerator{
+public class CreatePdfCVT implements BasePdfGenerator{
     
     TextModification txt = new TextModification();
     private PdfReader dataReaderPreprinted = null;
@@ -49,8 +49,8 @@ public class CreatePdfACD implements BasePdfGenerator{
     private float xAddr = 72;
     private float yInfo = 717;
     private float xInfo = 296;
-    private float xDot = 451;
-    private float xDataInfo = 456;
+    private float xDot = 481;
+    private float xDataInfo = 486;
     
     private String currDir = new String();
     private String paperDir = new String();
@@ -72,7 +72,7 @@ public class CreatePdfACD implements BasePdfGenerator{
 
         document.open();
         PdfContentByte canvas = writer.getDirectContent();
-        PdfPTable table = new PdfPTable(3);
+        PdfPTable table = new PdfPTable(2);
         
         canvas.beginText();
         canvas.endText();
@@ -129,9 +129,7 @@ public class CreatePdfACD implements BasePdfGenerator{
         yInfo -= 12.5;
 
         // Jumlah Premi/Kontribusi Top-Up Berkala
-        canvas.showTextAligned(Element.ALIGN_LEFT, "Jumlah Premi/", xInfo, yInfo, 0);
-        yInfo -= 12.5;
-        canvas.showTextAligned(Element.ALIGN_LEFT, "Kontribusi Top-Up Berkala", xInfo, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, "Jumlah Premi/Kontribusi Top-Up Berkala", xInfo, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, "[premiKontribusiBerkala]", xDataInfo, yInfo, 0);
         yInfo -= 12.5;
@@ -162,9 +160,7 @@ public class CreatePdfACD implements BasePdfGenerator{
         yInfo -= 12.5;
         
         // Uang Pertanggungan/Santunan Asuransi Dasar
-        canvas.showTextAligned(Element.ALIGN_LEFT, "Uang Pertanggungan/", xInfo, yInfo, 0);
-        yInfo -= 12.5;
-        canvas.showTextAligned(Element.ALIGN_LEFT, "Santunan Asuransi Dasar", xInfo, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, "Uang Pertanggungan/Santunan Asuransi Dasar", xInfo, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, "[uangPertanggungan]" , xDataInfo, yInfo, 0);
         yInfo -= 12.5;
@@ -181,19 +177,10 @@ public class CreatePdfACD implements BasePdfGenerator{
         canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, "[tanggalCetak]" , xDataInfo, yInfo, 0);
         yInfo -= 12.5;
-
-
-        // ========== PERIHAL ===========================
-//        canvas.showTextAligned(Element.ALIGN_LEFT,
-//                "Perihal : Status Polis Cuti Premi/Kontribusi Otomatis", xAddr, 561, 0);
-//        canvas.setFontAndSize(helvaticaBold, 10);
-//        canvas.showTextAligned(Element.ALIGN_RIGHT,
-//                "Jakarta, " + txt.convertDateMM(polisModel.getChdrdue()) , 544, 561, 0);
-//        canvas.setFontAndSize(helvatica, 10);
         
         // ===================== ISI SURAT ==========================
 
-        int topY = 520;   // posisi atas kolom
+        int topY = 540;   // posisi atas kolom
         int bottomY = 50; // posisi bawah kolom   
         int rightX = 548; // Posisi kanan kolom
         int leftX = 62; // Posisi kanan kolom
@@ -204,13 +191,15 @@ public class CreatePdfACD implements BasePdfGenerator{
         
         String bar = "RANGKUMAN TRANSAKSI ([CURRFROM] - [CURRTO])";
         
+        String perihal = "Status Keanggotaan Vitality Program (29 November 2025): SILVER";
+        
         txt.writeParagraph(paragraph, document, leftX, bottomY, rightX, topY, canvas, arial, 8.5f, 1.2f);
         canvas.endText();
         
         float barHeight = 17f;
         float barY = topY - 55;
         float barX = 62f;
-        float barWidth = 495f;
+        float barWidth = 510f;
         
         // kotak abu
         canvas.saveState();
@@ -220,34 +209,28 @@ public class CreatePdfACD implements BasePdfGenerator{
         canvas.restoreState();
         
         canvas.beginText();
-        txt.writeParagraph(bar, document, 174, bottomY, rightX, 482, canvas, arialBold, 10, 1.2f);
+        txt.writeParagraph(bar, document, 174, bottomY, rightX, 502, canvas, arialBold, 10, 1.2f);
+        txt.writeParagraph(perihal, document, leftX, bottomY, rightX, 477, canvas, arialBold, 8.5f, 1.2f);
         canvas.endText();
         
-        table.setTotalWidth(new float[] {90, 290, 118});
+        table.setTotalWidth(new float[] {386, 125});
         table.setLockedWidth(true);
         
         //Header
-        PdfPCell header1 = new PdfPCell(new Phrase("Periode", new Font(arialBold, 8.5f)));
+        PdfPCell header1 = new PdfPCell(new Phrase("Cashback", new Font(arialBold, 8.5f)));
         header1.setBackgroundColor(new BaseColor(230, 230, 230));
         header1.setPadding(5);
         header1.setHorizontalAlignment(Element.ALIGN_CENTER);
         header1.setVerticalAlignment(Element.ALIGN_MIDDLE);
         
-        PdfPCell header2 = new PdfPCell(new Phrase("Diskon Biaya Akuisisi", new Font(arialBold, 8.5f)));
+        PdfPCell header2 = new PdfPCell(new Phrase("Jumlah\n(Rupiah)", new Font(arialBold, 8.5f)));
         header2.setBackgroundColor(new BaseColor(230, 230, 230));
         header2.setPadding(5);
         header2.setHorizontalAlignment(Element.ALIGN_CENTER);
         header2.setVerticalAlignment(Element.ALIGN_MIDDLE);
         
-        PdfPCell header3 = new PdfPCell(new Phrase("Jumlah\n(Rupiah)", new Font(arialBold, 8.5f)));
-        header3.setBackgroundColor(new BaseColor(230, 230, 230));
-        header3.setPadding(9);
-        header3.setHorizontalAlignment(Element.ALIGN_CENTER);
-        header3.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        
         table.addCell(header1);
         table.addCell(header2);
-        table.addCell(header3);
         
         List<String[]> listData = new ArrayList<>();
         listData.add(new String[]{"29 November 2023", "Diskon Biaya Akuisisi yang dikreditkan", "1.734.000,00"});
@@ -268,32 +251,19 @@ public class CreatePdfACD implements BasePdfGenerator{
             c2.setPadding(4);
             table.addCell(c2);
 
-            PdfPCell c3 = new PdfPCell(new Phrase(row[2], fontArial));
-            c3.setHorizontalAlignment(Element.ALIGN_RIGHT);
-            c3.setVerticalAlignment(Element.ALIGN_MIDDLE);
-            c3.setPadding(4);
-            table.addCell(c3);
-
         }
         
-        PdfPCell t1 = new PdfPCell(new Phrase("", fontArial));
+        PdfPCell t1 = new PdfPCell(new Phrase("Total", fontArialB));
         t1.setHorizontalAlignment(Element.ALIGN_CENTER);
         t1.setVerticalAlignment(Element.ALIGN_MIDDLE);
         t1.setPadding(5);
         table.addCell(t1);
         
-        PdfPCell t2 = new PdfPCell(new Phrase("Total", fontArialB));
+        PdfPCell t2 = new PdfPCell(new Phrase("[AMOUNT]", fontArialB));
         t2.setHorizontalAlignment(Element.ALIGN_RIGHT);
         t2.setVerticalAlignment(Element.ALIGN_MIDDLE);
         t2.setPadding(5);
         table.addCell(t2);
-        
-        PdfPCell t3 = new PdfPCell(new Phrase("[TOTAL]", fontArialB));
-        t3.setHorizontalAlignment(Element.ALIGN_RIGHT);
-        t3.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        t3.setPadding(5);
-        table.addCell(t3);
-        
         
         table.writeSelectedRows(0, -1, 62, 455, canvas);
         

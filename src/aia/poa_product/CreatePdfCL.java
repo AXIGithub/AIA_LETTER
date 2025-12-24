@@ -28,7 +28,7 @@ import java.util.logging.Logger;
  *
  * @author Ratino
  */
-public class CreatePdfACM implements BasePdfGenerator{
+public class CreatePdfCL implements BasePdfGenerator{
     
     TextModification txt = new TextModification();
     private PdfReader dataReaderPreprinted = null;
@@ -36,6 +36,7 @@ public class CreatePdfACM implements BasePdfGenerator{
     private PdfImportedPage pageData = null;
     
     private BaseFont arial;
+    private BaseFont arialItalic;
     private BaseFont arialUnderline;
     private BaseFont arialBold;    
     private BaseFont barcodeFont;
@@ -51,6 +52,7 @@ public class CreatePdfACM implements BasePdfGenerator{
     private String dirFonts = new String();
     private String sortingDir = new String();
     private String outputDir = new String();
+    
     
     
 
@@ -74,10 +76,11 @@ public class CreatePdfACM implements BasePdfGenerator{
 
         BaseFont helvatica = BaseFont.createFont(BaseFont. HELVETICA, BaseFont.CP1250, BaseFont.NOT_EMBEDDED);
         BaseFont helvaticaBold = BaseFont.createFont(BaseFont. HELVETICA_BOLD, BaseFont.CP1250, BaseFont.NOT_EMBEDDED);
-        
+
         arial = BaseFont.createFont(dirFonts + "Arial.ttf", BaseFont.IDENTITY_H, true);
         arialUnderline = BaseFont.createFont(dirFonts + "ArialUnderline.ttf", BaseFont.IDENTITY_H, true);
         arialBold = BaseFont.createFont(dirFonts + "arial_bold.ttf", BaseFont.IDENTITY_H, true);
+        
         
         canvas.beginText();
         canvas.setFontAndSize(arial, 9.5f);
@@ -86,7 +89,7 @@ public class CreatePdfACM implements BasePdfGenerator{
         canvas.showTextAligned(Element.ALIGN_LEFT, "Kepada Yth.", xAddr, yAddr, 0);
         yAddr = (float) (yAddr - 10);
         canvas.setFontAndSize(arialBold, 9.5f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "Bpk/Ibu " + "[AGNTNAME]", xAddr, yAddr, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, "Bpk/Ibu " + "ahli waris dari [AGNTNAME]", xAddr, yAddr, 0);
         yAddr = (float) (yAddr - 10);
         canvas.showTextAligned(Element.ALIGN_LEFT, "[ADDRESS1]", xAddr, yAddr, 0);
         yAddr = (float) (yAddr - 10);
@@ -96,36 +99,50 @@ public class CreatePdfACM implements BasePdfGenerator{
         yAddr = (float) (yAddr - 10);
         canvas.showTextAligned(Element.ALIGN_LEFT, "[POSTCODE]", xAddr, yAddr, 0);
         
-
-
+        // ================= INFO POLIS =====================
+        // No Polis
+        canvas.showTextAligned(Element.ALIGN_RIGHT,
+                "Jakarta, " + "[OCCDATE]" , xInfo, yInfo, 0);
+        
         // ========== PERIHAL ===========================
         canvas.showTextAligned(Element.ALIGN_LEFT,
-                "Perihal : Pengakhiran Perjanjian Agen", xAddr, 561, 0);
+                "Hal : Pengajuan Klaim Polis no. 39080086 no Klaim WWP20250900005\n" +
+"        atas nama MASUDI", xAddr, 561, 0);
         canvas.showTextAligned(Element.ALIGN_RIGHT,
-                "Jakarta, " + "[tanggalCetak]" , 544, 561, 0);
+                "Jakarta, " + txt.convertDateMM(polisModel.getChdrdue()) , xInfo, yInfo, 0);
         canvas.setFontAndSize(arial, 9.5f);
+        canvas.endText();
         
         // ===================== ISI SURAT ==========================
 
         int topY = 550;   // posisi atas kolom
         int bottomY = 50; // posisi bawah kolom   
         int rightX = 545; // Posisi kanan kolom
+
+        
         
         String paragraph = "Dengan Hormat,\n" + "\n" +
-                "Berdasarkan hasil evaluasi yang dilakukan oleh PT AIA FINANCIAL (“Perusahaan”), Perusahaan " +
-                "mencatat bahwa Anda tidak memenuhi ketentuan target yang telah ditetapkan oleh Perusahaan. Maka " +
-                "berdasarkan ketentuan Perjanjian Agen Asuransi yang telah Anda dan Perusahaan tandatangani, " +
-                "Perusahaan berhak dan dengan ini melakukan pengakhiran Perjanjian Agen Asuransi efektif pada " +
-                "tanggal [b][TRMDATE][/b]." + ".\n" ;
+                "Terima kasih atas kepercayaan Anda telah memilih PT AIA FINANCIAL (AIA) sebagai penyedia kebutuhan asuransi bagi Anda dan keluarga.\n" + "\n" +
                 
+                "Kami memahami kesibukan Anda sehingga sampai surat ini diterbitkan, kami belum menerima pembayaran Premi/Kontribusi Polis Anda untuk jatuh tempo tanggal [b]"
+                        + txt.convertDateMM(polisModel.getChdrdue())  + "[/b] (Tanggal Jatuh Tempo) yang telah melewati Masa Leluasa.\n" + "\n" +
                 
-
+                "Kondisi tersebut di atas menyebabkan status Polis Anda menjadi Cuti Premi/Kontribusi Otomatis dan akan " +
+                "dikenakan biaya (jika ada) sebagaimana diatur dalam Ketentuan Polis. Fasilitas Cuti Premi/Kontribusi Otomatis " +
+                "akan berlaku selama Nilai Akun Polis Anda masih mencukupi. Anda dapat menghentikan Fasilitas Cuti " +
+                "Premi/Kontribusi ini dengan melunasi tunggakan Premi/Kontribusi yang dapat disetorkan ke rekening " + polisModel.getRek_aia() +
+                " atau [bankKey] [FLDENT] atas nama " + polisModel.getVa_owner() + ". " + 
+                "Sebagai informasi tambahan, berdasarkan catatan kami sampai dengan surat ini diterbitkan, terdapat titipan Premi/Kontribusi sebesar Rp" + txt.setCurrencyIdr(polisModel.getSacscurbal()) +
+                " (" + polisModel.getTerbilang() + ")" + " pada Polis Anda.\n" + "\n" + 
+                
+                "Apabila Anda telah melakukan pembayaran Premi sebelum Masa Leluasa berakhir silakan menghubungi Customer Care kami agar pembayaran Premi/Kontribusi Anda dapat dibukukan.\n\n" +
+                
+                "Demikian kami sampaikan. Terima kasih atas perhatian Anda. Untuk informasi lebih lanjut, silakan hubungi AIA Customer Care kami mulai hari Senin - Jumat pada pukul 08.00 - 17.00 WIB, dengan senang hati kami akan membantu Anda." +
+                "\n\n\n\n" +
+                "Hormat kami,";
         
-        txt.writeParagraph(paragraph, document, xAddr, bottomY, rightX, topY, canvas, arial, 9.5f, 1.2f);
-
-        canvas.endText();
-        document.close();
-
+            txt.writeParagraph(paragraph, document, xAddr, bottomY, rightX, topY, canvas, arial, 9.5f, 1.2f);
+            document.close();
 
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
@@ -136,7 +153,7 @@ public class CreatePdfACM implements BasePdfGenerator{
             paperDir = currDir + "\\\\" + "PAPER\\\\";
             dirFonts = currDir + "\\\\" + "FONTS\\\\";
         } catch (IOException ex) {
-            Logger.getLogger(CreatePdfAPH.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CreatePdfCL.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     

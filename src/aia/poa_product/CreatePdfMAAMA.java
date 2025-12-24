@@ -28,7 +28,7 @@ import java.util.logging.Logger;
  *
  * @author Ratino
  */
-public class CreatePdfAPH implements BasePdfGenerator{
+public class CreatePdfMAAMA implements BasePdfGenerator{
     
     TextModification txt = new TextModification();
     private PdfReader dataReaderPreprinted = null;
@@ -297,7 +297,7 @@ public class CreatePdfAPH implements BasePdfGenerator{
             paperDir = currDir + "\\\\" + "PAPER\\\\";
             dirFonts = currDir + "\\\\" + "FONTS\\\\";
         } catch (IOException ex) {
-            Logger.getLogger(CreatePdfAPH.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CreatePdfMAAMA.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     

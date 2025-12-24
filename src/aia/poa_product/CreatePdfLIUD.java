@@ -13,6 +13,7 @@ import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.ColumnText;
 import com.itextpdf.text.pdf.PdfContentByte;
@@ -28,7 +29,7 @@ import java.util.logging.Logger;
  *
  * @author Ratino
  */
-public class CreatePdfAPL implements BasePdfGenerator{
+public class CreatePdfLIUD implements BasePdfGenerator{
     
     TextModification txt = new TextModification();
     private PdfReader dataReaderPreprinted = null;
@@ -36,6 +37,7 @@ public class CreatePdfAPL implements BasePdfGenerator{
     private PdfImportedPage pageData = null;
     
     private BaseFont arial;
+    private BaseFont arialItalic;
     private BaseFont arialUnderline;
     private BaseFont arialBold;    
     private BaseFont barcodeFont;
@@ -51,6 +53,7 @@ public class CreatePdfAPL implements BasePdfGenerator{
     private String dirFonts = new String();
     private String sortingDir = new String();
     private String outputDir = new String();
+    
     
     
 
@@ -74,10 +77,11 @@ public class CreatePdfAPL implements BasePdfGenerator{
 
         BaseFont helvatica = BaseFont.createFont(BaseFont. HELVETICA, BaseFont.CP1250, BaseFont.NOT_EMBEDDED);
         BaseFont helvaticaBold = BaseFont.createFont(BaseFont. HELVETICA_BOLD, BaseFont.CP1250, BaseFont.NOT_EMBEDDED);
-        
+
         arial = BaseFont.createFont(dirFonts + "Arial.ttf", BaseFont.IDENTITY_H, true);
         arialUnderline = BaseFont.createFont(dirFonts + "ArialUnderline.ttf", BaseFont.IDENTITY_H, true);
         arialBold = BaseFont.createFont(dirFonts + "arial_bold.ttf", BaseFont.IDENTITY_H, true);
+        
         
         canvas.beginText();
         canvas.setFontAndSize(arial, 9.5f);
@@ -86,7 +90,7 @@ public class CreatePdfAPL implements BasePdfGenerator{
         canvas.showTextAligned(Element.ALIGN_LEFT, "Kepada yang terhormat :", xAddr, yAddr, 0);
         yAddr = (float) (yAddr - 10);
         canvas.setFontAndSize(arialBold, 9.5f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "Bapak/Ibu [owner]", xAddr, yAddr, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, "Bapak/Ibu [OWNER]", xAddr, yAddr, 0);
         yAddr = (float) (yAddr - 10);
         canvas.setFontAndSize(arial, 9.5f);
         canvas.showTextAligned(Element.ALIGN_LEFT, "[alamat1]", xAddr, yAddr, 0);
@@ -97,103 +101,140 @@ public class CreatePdfAPL implements BasePdfGenerator{
         yAddr = (float) (yAddr - 10);
         canvas.showTextAligned(Element.ALIGN_LEFT, "[kodePos]", xAddr, yAddr, 0);
 
+        
+        
         // ================= INFO POLIS =====================
         // No Polis
-        canvas.setFontAndSize(arial, 8.75f);
         canvas.showTextAligned(Element.ALIGN_LEFT, "No. Polis", xInfo, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, "[noPolis]", xDataInfo, yInfo, 0);
-        yInfo -= 10.5;
+        yInfo -= 12.5f;
 
         // Nama Produk
         canvas.showTextAligned(Element.ALIGN_LEFT, "Nama Produk", xInfo, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, "[namaProduk]", xDataInfo, yInfo, 0);
-        yInfo -= 10.5;
+        yInfo -= 12.5f;
 
-        // Nama Tertanggung
-        canvas.showTextAligned(Element.ALIGN_LEFT, "Nama Tertanggung", xInfo, yInfo, 0);
+        // Nama Tertanggung/Peserta
+        canvas.showTextAligned(Element.ALIGN_LEFT, "Nama Tertanggung/Peserta", xInfo, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "[namaTertanggung]", xDataInfo, yInfo, 0);
-        yInfo -= 10.5;
+        canvas.showTextAligned(Element.ALIGN_LEFT, "[namaPeserta]", xDataInfo, yInfo, 0);
+        yInfo -= 12.5f;
+
+
+        // Tanggal Mulai Asuransi 
+        canvas.showTextAligned(Element.ALIGN_LEFT, "Tanggal Mulai Asuransi", xInfo, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, "[tanggalMulai]", xDataInfo, yInfo, 0);
+        yInfo -= 12.5f;
+
+        // Jumlah Premi / Kontribusi
+        canvas.showTextAligned(Element.ALIGN_LEFT, "Jumlah Premi/Kontribusi", xInfo, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, "Rp" + "[jumlahPremi]", xDataInfo, yInfo, 0);
+        yInfo -= 12.5f;
+
+        // Periode Bayar
+        String periode = polisModel.getBillfreq().equals("12") ? "Bulanan" : "Tahunan";
+        canvas.showTextAligned(Element.ALIGN_LEFT, "Periode Bayar", xInfo, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, "[periodeBayar]", xDataInfo, yInfo, 0);
+        yInfo -= 12.5f;
 
         // Tanggal Mulai Asuransi
         canvas.showTextAligned(Element.ALIGN_LEFT, "Tanggal Mulai Asuransi", xInfo, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, "[tanggalMulai]", xDataInfo, yInfo, 0);
-        yInfo -= 10.5;
-
-        // Mata Uang
-        canvas.showTextAligned(Element.ALIGN_LEFT, "Mata Uang", xInfo, yInfo, 0);
-        canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "[mataUang]", xDataInfo, yInfo, 0);
-        yInfo -= 10.5;
-
-        // Premi
-        canvas.showTextAligned(Element.ALIGN_LEFT, "Premi", xInfo, yInfo, 0);
-        canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "Rp" + "[premiKontribusi]", xDataInfo, yInfo, 0);
-        yInfo -= 10.5;
-
-        // Periode pembayaran
-        String periode = polisModel.getBillfreq().equals("12") ? "Bulanan" : polisModel.getBillfreq();
-        canvas.showTextAligned(Element.ALIGN_LEFT, "Periode Pembayaran", xInfo, yInfo, 0);
-        canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "[periode]", xDataInfo, yInfo, 0);
-        yInfo -= 10.5;
+        yInfo -= 12.5f;
 
         // Tanggal Cetak
         canvas.showTextAligned(Element.ALIGN_LEFT, "Tanggal Cetak", xInfo, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, "[tanggalCetak]" , xDataInfo, yInfo, 0);
-        yInfo -= 10.5;
+        yInfo -= 12.5f;
+        canvas.setFontAndSize(arialBold, 9.5f);
 
 
         // ========== PERIHAL ===========================
-        canvas.setFontAndSize(arialBold, 8.75f);
         canvas.showTextAligned(Element.ALIGN_LEFT,
-                "Perihal : Penggunaan Fasilitas Pinjaman Polis Otomatis", xAddr, 561, 0);
+                "Perihal : Pemberitahuan Status Polis", xAddr, 561, 0);
+        canvas.setFontAndSize(arialBold, 9.5f);
         canvas.showTextAligned(Element.ALIGN_RIGHT,
                 "Jakarta, " + "[tanggalCetak]" , 544, 561, 0);
-        canvas.setFontAndSize(arial, 8.75f);
+        canvas.setFontAndSize(arial, 9.5f);
+        canvas.endText();
         
         // ===================== ISI SURAT ==========================
 
         int topY = 550;   // posisi atas kolom
         int bottomY = 50; // posisi bawah kolom   
         int rightX = 545; // Posisi kanan kolom
+
         
         String paragraph = "Dengan Hormat,\n" + "\n" +
-                "Terima kasih atas kepercayaan Anda telah memilih PT AIA FINANCIAL (AIA) sebagai penyedia kebutuhan asuransi bagi Anda dan keluarga.\n" + "\n" +
-                
-                "Kami memahami kesibukan Anda sehingga sampai surat ini diterbitkan, kami belum menerima pembayaran Premi/Kontribusi Polis Anda untuk jatuh tempo tanggal [b]"
-                        + "[jatuhTempo]"  + "[/b] (Tanggal Jatuh Tempo) yang telah melewati Masa Leluasa.\n" + "\n" +
-                
-                "Kondisi tersebut di atas menyebabkan pembayaran Premi Polis Anda dilanjutkan dengan menggunakan fasilitas " +
-                "Pinjaman Premi Otomatis dan pembayaran Premi dilakukan secara bulanan dari Nilai Tunai Polis Anda. Fasilitas Cuti Premi/Kontribusi Otomatis " +
-                "akan berlaku selama Nilai Akun Polis Anda masih mencukupi.  Pinjaman Premi Otomatis ini akan " +
-                "dikenakan bunga majemuk yang besarnya dapat berubah sewaktu-waktu sesuai dengan kebijakan AIA [i](informasi tingkat " +
-                "suku bunga Pinjaman Premi Otomatis dapat dilihat melalui website aia-financial.co.id)[/i].\n" + "\n" +
-                
-                "Anda dapat menghentikan fasilitas Pinjaman Premi Otomatis ini dengan melunasi tunggakan Premi beserta bunga " +
-                "dengan cara menyetorkan Premi ke rekening  " + "[rekAIA]" + " atau [banKey] [FLDENT] atas nama " + "[owner]" + ". " + 
-                "Sebagai informasi tambahan, berdasarkan catatan kami sampai dengan surat ini diterbitkan, terdapat titipan Premi/Kontribusi sebesar Rp" + "[premiKontribusi]" +
-                " pada Polis Anda.\n" + 
-                
-                "Apabila Anda telah melakukan pembayaran Premi sebelum Masa Leluasa berakhir silahkan menghubungi AIA Customer " +
-                "Care kami agar pembayaran Premi Anda dapat dibukukan.\n\n" +
-                
-                "Demikian kami sampaikan. Terima kasih atas perhatian Anda. Untuk informasi lebih lanjut, silakan hubungi AIA kami mulai hari Senin - Jumat pada pukul 08.00 - 17.00 WIB, dengan senang hati kami akan membantu Anda." +
-                "\n\n\n\n\n\n" +
-                
-                "Hormat kami,";
-
+                "Terima kasih atas kepercayaan Anda telah memilih PT AIA FINANCIAL (AIA) sebagai penyedia kebutuhan " +
+                "asuransi bagi Anda dan keluarga.\n\n" +
+                "Bersama surat ini kami informasikan bahwa Nilai Akun Polis Anda per tanggal 08 Desember 2025 tidak mencukupi " +
+                "untuk pembayaran biaya-biaya (administrasi, pemeliharaan asuransi dan biaya asuransi tambahan), oleh " +
+                "karenanya [b]status Polis anda menjadi tidak aktif saat ini[/b].\n\n" +
+                "Mengingat pentingnya manfaat dari perlindungan asuransi, kami menyarankan Anda secepatnya mengajukan " +
+                "pemulihan Polis ini dengan cara :\n";
         
-        txt.writeParagraph(paragraph, document, xAddr, bottomY, rightX, topY, canvas, arial, 8.75f, 1.2f);
+        txt.writeParagraph(paragraph, document, xAddr, bottomY, rightX, topY, canvas, arial, 9.5f, 1.2f);
+        
+        String[] numbering = {
+            "Melakukan penambahan dana atau premi Top-Up dengan cara menyetorkan Premi/Kontribusi ke rekening BCA " +
+            "0080840023150144 atau Lainnya 40023150144 atas nama EDY SUDARMAJI dan melampirkan bukti " +
+            "pembayarannya. Sebagai informasi tambahan, berdasarkan catatan kami sampai dengan surat ini diterbitkan, " +
+            "terdapat titipan Premi/Kontribusi sebesar Rp0,00 pada Polis Anda.",
+            "Melengkapi formulir penambahan dana Top-Up yang dapat diisi melalui www.aia-financial.co.id.",
+            "Melengkapi formulir pemulihan yang dapat diisi melalui www.aia-financial.co.id.",
+            "Melampirkan fotokopi identitas diri yang masih berlaku."
+        };
+        
+        float leftXNum = 62;
+        float rightXNum = 548;
+        float topYNum = 425;
+        float bottomYNum = 100;
 
-        canvas.endText();
+        for (int i = 0; i < numbering.length; i++) {
+
+            ColumnText ct = new ColumnText(canvas);
+            ct.setSimpleColumn(leftXNum, bottomYNum, rightXNum, topYNum);
+
+            Paragraph p = new Paragraph();
+            p.setFont(new Font(arial, 9.5f));
+
+            p.setIndentationLeft(20);  
+            p.setFirstLineIndent(-10); 
+            p.setLeading(13.0f);
+
+            p.add((i + 1) + ". " + numbering[i]);
+
+            ct.addElement(p);
+
+            ct.go();
+            
+            topYNum = ct.getYLine();  
+        }
+
+
+
+        String paragraph2 = "Demikian kami sampaikan. Terima kasih atas perhatian Anda. Untuk mengetahui informasi besarnya dana Top-Up " +
+                "yang perlu ditambahkan atau informasi lainnya, silakan hubungi AIA Customer Care kami mulai hari Senin - Jumat " +
+                "pada pukul 08.00 - 17.00 WIB, dengan senang hati kami akan membantu.\n\n\n" +
+                "Hormat kami,\n\n";
+        
+        txt.writeParagraph(paragraph2, document, xAddr, bottomY, rightX, 320, canvas, arial, 9.5f, 1.2f);
+        
+        String paragraph3 = "Catatan : Perlu diketahui bahwa Penambahan Premi Top-Up tidak menjamin Polis akan tetap aktif sampai dengan Tanggal Jatuh Tempo berikutnya, mengingat kinerja " +
+                "investasi sesuai dengan pasar. Sesuai dengan Ketentuan Umum Polis apabila Nilai Akun tidak cukup untuk membayar biaya-biaya yang ada maka Polis akan kembali " +
+                "menjadi tidak aktif.";
+        
+        txt.writeParagraph(paragraph3, document, xAddr, bottomY, rightX, 186, canvas, arial, 6.2f, 1.6f);
+            
         document.close();
-
 
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
@@ -204,7 +245,7 @@ public class CreatePdfAPL implements BasePdfGenerator{
             paperDir = currDir + "\\\\" + "PAPER\\\\";
             dirFonts = currDir + "\\\\" + "FONTS\\\\";
         } catch (IOException ex) {
-            Logger.getLogger(CreatePdfAPH.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CreatePdfLIUD.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     

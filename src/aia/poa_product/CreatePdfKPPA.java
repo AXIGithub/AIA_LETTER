@@ -34,7 +34,7 @@ import java.util.logging.Logger;
  *
  * @author Ratino
  */
-public class CreatePdfACD implements BasePdfGenerator{
+public class CreatePdfKPPA implements BasePdfGenerator{
     
     TextModification txt = new TextModification();
     private PdfReader dataReaderPreprinted = null;
