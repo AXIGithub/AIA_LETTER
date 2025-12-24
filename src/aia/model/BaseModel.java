@@ -18,7 +18,7 @@ public class BaseModel {
     protected String addr03;
     protected String addr04;
     protected String addr05;
-
+    protected String flagBca;
     protected String pcode;
     protected String prodName;
     protected String flgSyariah;
@@ -129,6 +129,16 @@ public class BaseModel {
     public void setDteBirth(String dteBirth) {
         this.dteBirth = dteBirth;
     }
+
+    public String getFlagBca() {
+        return flagBca;
+    }
+
+    public void setFlagBca(String flagBca) {
+        this.flagBca = flagBca;
+    }
+    
+    
 
     
     
