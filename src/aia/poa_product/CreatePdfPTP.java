@@ -7,13 +7,13 @@ package aia.poa_product;
 
 import aia.controller.BasePdfGenerator;
 import aia.controller.TextModification;
-import aia.model.PolisModel;
+import aia.model.BaseModel;
+import aia.model.productMapping.PtpModel;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
-import com.itextpdf.text.ListItem;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
@@ -29,8 +29,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  *
@@ -45,30 +48,49 @@ public class CreatePdfPTP implements BasePdfGenerator{
     
     private BaseFont arial;
     private BaseFont arialItalic;
-    private BaseFont arialBold;    
-    private BaseFont barcodeFont;
-    private float yAddr = 312;
-    private float xAddr = 48;
-    private float yInfo = 317;
-    private float xInfo = 270;
-    private float xDot = 381;
-    private float xDataInfo = 386;
+    private BaseFont arialBold;
+    private float yAddr;
+    private float xAddr;
+    private float yInfo;
+    private float xInfo;
+    private float xDot;
+    private float xDataInfo;
+    private float boxCenterX;
     
     private String currDir = new String();
     private String paperDir = new String();
     private String dirFonts = new String();
     private String sortingDir = new String();
     private String outputDir = new String();
+    private String fileName = new String();
+    private String barcode = new String();
     
     
 
     @Override
-    public void generate(PolisModel polisModel, String product, String[] params) throws Exception {
+    public void generate(List<BaseModel> dataList, String product, String cetak, String[] params) throws Exception {
+        if (dataList.isEmpty()) {
+            throw new IllegalArgumentException("Data kosong");
+        }
+
+        BaseModel first = dataList.get(0);
+        
+        if(!(first instanceof PtpModel)){
+            throw new IllegalArgumentException("Not Ptp Model");
+        }
+        
+        PtpModel model = (PtpModel) first;
+        yAddr = 312;
+        xAddr = 48;
+        yInfo = 317;
+        xInfo = 270;
+        xDot = 381;
+        xDataInfo = 386;
         sortingDir = params[2];
         getCurrentDir();
         Document document = new Document(PageSize.A5.rotate());
         PdfWriter writer = PdfWriter.getInstance(document,
-                new FileOutputStream(sortingDir + product + "_" + polisModel.getChdrnum() + ".pdf"));
+                new FileOutputStream(sortingDir + product + "_" + model.getChdrnum() + ".pdf"));
         
         dataReaderPreprinted = new PdfReader(paperDir + "PAPER SRN.pdf");
 
@@ -95,16 +117,81 @@ public class CreatePdfPTP implements BasePdfGenerator{
         canvas.showTextAligned(Element.ALIGN_LEFT, "Kepada yang terhormat :", xAddr, yAddr, 0);
         yAddr = (float) (yAddr - 10);
         canvas.setFontAndSize(arialBold, 8.5f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "Bapak/Ibu [owner]", xAddr, yAddr, 0);
-        yAddr = (float) (yAddr - 10);
+        
+        String owner = model.getOwner(); 
+        String owner1 = owner;
+        String owner2 = "";
+        
+        String[] split = owner.split(" "); 
+        
+        if (owner.length() > 25) {
+            StringBuilder sb1 = new StringBuilder();
+            StringBuilder sb2 = new StringBuilder();
+
+            for (int i = 0; i < split.length; i++) {
+                if (i <= 1) { 
+                    sb1.append(split[i]).append(" ");
+                } else {
+                    sb2.append(split[i]).append(" ");
+                }
+            }
+
+            owner1 = sb1.toString().trim();
+            owner2 = sb2.toString().trim();
+        }
+        
+        canvas.showTextAligned(Element.ALIGN_LEFT, "Bapak/Ibu " + owner1, xAddr, yAddr, 0);
+        yAddr -= 10;
+        if (!owner2.isEmpty()) {
+            canvas.showTextAligned(Element.ALIGN_LEFT, owner2, xAddr, yAddr, 0);
+            yAddr -= 10;
+        }
+        
+        int emptyCount = 0;
+        if (!hasText(model.getAddr01())) emptyCount++;
+        if (!hasText(model.getAddr02())) emptyCount++;
+        if (!hasText(model.getAddr03())) emptyCount++;
+        if (!hasText(model.getAddr04())) emptyCount++;
+        if (!hasText(model.getAddr05())) emptyCount++;
+
+        List<String> addressLines = new ArrayList<>();
+
+        if (emptyCount >= 2) {
+            if (hasText(model.getAddr01())) {
+                addressLines.add(model.getAddr01());
+            }
+
+            String line23 = Stream.of(model.getAddr02(), model.getAddr03())
+                    .filter(this::hasText)
+                    .collect(Collectors.joining(" "));
+            if (!line23.isEmpty()) {
+                addressLines.add(line23);
+            }
+
+            String line45 = Stream.of(model.getAddr04(), model.getAddr05())
+                    .filter(this::hasText)
+                    .collect(Collectors.joining(" "));
+            if (!line45.isEmpty()) {
+                addressLines.add(line45);
+            }
+
+        } else {
+            if (hasText(model.getAddr01())) addressLines.add(model.getAddr01());
+            if (hasText(model.getAddr02())) addressLines.add(model.getAddr02());
+            if (hasText(model.getAddr03())) addressLines.add(model.getAddr03());
+            if (hasText(model.getAddr04())) addressLines.add(model.getAddr04());
+            if (hasText(model.getAddr05())) addressLines.add(model.getAddr05());
+        }
+        
+        if (hasText(model.getPcode())) {
+            addressLines.add(model.getPcode());
+        }
+        
         canvas.setFontAndSize(arial, 8.5f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "[alamat1]", xAddr, yAddr, 0);
-        yAddr = (float) (yAddr - 10);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "[alamat2]" + " " + "[alamat3]", xAddr, yAddr, 0);
-        yAddr = (float) (yAddr - 10);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "[alamat4]" + " " + "[alamat5]", xAddr, yAddr, 0);
-        yAddr = (float) (yAddr - 10);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "[kodePos]", xAddr, yAddr, 0);
+        for (String line : addressLines) {
+            canvas.showTextAligned(Element.ALIGN_LEFT, line, xAddr, yAddr, 0);
+            yAddr -= 10;
+        }
 
         // ================= INFO POLIS =====================
         // No Polis
@@ -112,15 +199,7 @@ public class CreatePdfPTP implements BasePdfGenerator{
         canvas.showTextAligned(Element.ALIGN_LEFT, "No. Polis", xInfo, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
         canvas.setFontAndSize(arialBold, 8f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "[CHDRNUM]", xDataInfo, yInfo, 0);
-        yInfo -= 11;
-
-        // Nama Produk
-        canvas.setFontAndSize(arial, 8f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "Nama Produk", xInfo, yInfo, 0);
-        canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
-        canvas.setFontAndSize(arialBold, 8f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "[PROD_NAME]", xDataInfo, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, model.getChdrnum(), xDataInfo, yInfo, 0);
         yInfo -= 11;
 
         // Nama Tertanggung/Peserta
@@ -128,39 +207,49 @@ public class CreatePdfPTP implements BasePdfGenerator{
         canvas.showTextAligned(Element.ALIGN_LEFT, "Nama Tertanggung/Peserta", xInfo, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
         canvas.setFontAndSize(arialBold, 8f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "[NAME]", xDataInfo, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, model.getSurname(), xDataInfo, yInfo, 0);
         yInfo -= 11;
-
-        // Mata Uang
+        
+        // Nama Produk
         canvas.setFontAndSize(arial, 8f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "Mata Uang", xInfo, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, "Nama Produk", xInfo, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
         canvas.setFontAndSize(arialBold, 8f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "[mataUang]", xDataInfo, yInfo, 0);
-        yInfo -= 11;
-
-        // Uang Pertanggungan Dasar
-        canvas.setFontAndSize(arial, 8f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "Uang Pertanggungan Dasar", xInfo, yInfo, 0);
-        canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
-        canvas.setFontAndSize(arialBold, 8f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "[SUMINS]", xDataInfo, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, model.getProdName(), xDataInfo, yInfo, 0);
         yInfo -= 11;
 
         // Tanggal Mulai Asuransi
         canvas.setFontAndSize(arial, 8f);
+        String occdate = model.getOccdate();
+        int dotIndex = occdate.indexOf(".");
+        String subsOccdate = occdate.substring(0, dotIndex);
         canvas.showTextAligned(Element.ALIGN_LEFT, "Tanggal Mulai Asuransi", xInfo, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
         canvas.setFontAndSize(arialBold, 8f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "[OCCDATE]", xDataInfo, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, txt.convertDateMM(subsOccdate), xDataInfo, yInfo, 0);
         yInfo -= 11;
-        
+
         // Status Polis
         canvas.setFontAndSize(arial, 8f);
+        String status;
+        switch (model.getStatcode()) {
+            case "IF":
+                status = "Aktif";
+                break;
+            case "CF":
+                status = "CF";
+                break;
+            case "NF":
+                status = "Tidak Aktif";
+                break;
+            default:
+                status = "Unknown";
+                break;
+        }
         canvas.showTextAligned(Element.ALIGN_LEFT, "Status Polis", xInfo, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
         canvas.setFontAndSize(arialBold, 8f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "[statusPolis]", xDataInfo, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, status, xDataInfo, yInfo, 0);
         yInfo -= 11;
         
         // Tanggal Cetak
@@ -168,24 +257,24 @@ public class CreatePdfPTP implements BasePdfGenerator{
         canvas.showTextAligned(Element.ALIGN_LEFT, "Tanggal Cetak", xInfo, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
         canvas.setFontAndSize(arialBold, 8f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "[tanggalCetak]" , xDataInfo, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, txt.convertDateMM(cetak) , xDataInfo, yInfo, 0);
 
 
         // ========== PERIHAL ===========================
         canvas.setFontAndSize(arialBold, 8.5f);
         canvas.showTextAligned(Element.ALIGN_LEFT,
-                "Perihal : Pemberitahuan Jatuh Tempo", xAddr, 201, 0);
+                "Perihal : Kelebihan Pembayaran Premi/Kontribusi", xAddr, 201, 0);
         canvas.setFontAndSize(arialBold, 8f);
         canvas.showTextAligned(Element.ALIGN_RIGHT,
-                "Jakarta, " + "[tanggalCetak]" , 544, 201, 0);
+                "Jakarta, " + txt.convertDateMM(cetak) , 544, 201, 0);
         canvas.endText();
         
         // ===================== ISI SURAT ==========================
         
-        table.setTotalWidth(new float[] {75, 90, 150, 110, 90});
+        int topY = 197;
+        table.setTotalWidth(new float[] {75, 90, 140, 100, 90});
         table.setLockedWidth(true);
         
-        //Header
         PdfPCell header1 = new PdfPCell(new Phrase("Periode Bayar", new Font(arialBold, 7.5f)));
         header1.setBackgroundColor(new BaseColor(150, 150, 150));
         header1.setPadding(4);
@@ -198,19 +287,19 @@ public class CreatePdfPTP implements BasePdfGenerator{
         header2.setHorizontalAlignment(Element.ALIGN_CENTER);
         header2.setVerticalAlignment(Element.ALIGN_MIDDLE);
         
-        PdfPCell header3 = new PdfPCell(new Phrase("Premi/kontribusi", new Font(arialBold, 7.5f)));
+        PdfPCell header3 = new PdfPCell(new Phrase("Premi/kontribusi Lanjutan", new Font(arialBold, 7.5f)));
         header3.setBackgroundColor(new BaseColor(150, 150, 150));
         header3.setPadding(4);
         header3.setHorizontalAlignment(Element.ALIGN_CENTER);
         header3.setVerticalAlignment(Element.ALIGN_MIDDLE);
         
-        PdfPCell header4 = new PdfPCell(new Phrase("Titipan Premi/Kontribusi", new Font(arialBold, 7.5f)));
+        PdfPCell header4 = new PdfPCell(new Phrase("Pembayaran Premi/Kontribusi Lanjutan", new Font(arialBold, 7.5f)));
         header4.setBackgroundColor(new BaseColor(150, 150, 150));
         header4.setPadding(4);
         header4.setHorizontalAlignment(Element.ALIGN_CENTER);
         header4.setVerticalAlignment(Element.ALIGN_MIDDLE);
         
-        PdfPCell header5 = new PdfPCell(new Phrase("Total Premi/Kontribusi", new Font(arialBold, 7.5f)));
+        PdfPCell header5 = new PdfPCell(new Phrase("Kelebihan Pembayaran Premi/Kontribusi Lanjutan", new Font(arialBold, 7.5f)));
         header5.setBackgroundColor(new BaseColor(150, 150, 150));
         header5.setPadding(4);
         header5.setHorizontalAlignment(Element.ALIGN_CENTER);
@@ -222,10 +311,29 @@ public class CreatePdfPTP implements BasePdfGenerator{
         table.addCell(header4);
         table.addCell(header5);
         
-        List<String[]> listData = new ArrayList<>();
-        listData.add(new String[]{"[periodeBayar]", "[INSTFROM]", "[SINSTAMT]", "[ZVPFEE]", "[TOTALPREMI]"});
+        String periode;
+        switch (model.getBillFreq()) {
+            case "12":
+                periode = "Bulanan";
+                break;
+            case "04":
+                periode = "Triwulan";
+                break;
+            case "02":
+                periode = "Semesteran";
+                break;
+            case "01":
+                periode = "Tahunan";
+                break;
+            default:
+                periode = "Sekaligus";
+                break;
+        }
         
-        Font fontArial = new Font(arial, 7.5f);
+        List<String[]> listData = new ArrayList<>();
+        listData.add(new String[]{periode, "[TEST]", "[TEST]", "[TEST]", "[TEST]"});
+        
+        Font fontArial = new Font(arialBold, 7.5f);
         
         for (String[] row : listData) {
             PdfPCell c1 = new PdfPCell(new Phrase(row[0], fontArial));
@@ -259,28 +367,36 @@ public class CreatePdfPTP implements BasePdfGenerator{
             table.addCell(c5);
 
         }
-        table.writeSelectedRows(0, -1, xAddr, 197, canvas);
+        table.writeSelectedRows(0, -1, xAddr, topY, canvas);
+        topY -= 45;
         
         canvas.beginText();
         canvas.setFontAndSize(arial, 7.5f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "Pembayaran Premi/Kontribusi melalui:", xAddr, 150, 0);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "- Transfer ke rekening atas nama [OWNER] :", 70, 140, 0);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "• No Rekening VA [YBANKKEY] atau [YBANKKEY]", 73, 130, 0);
-        canvas.showTextAligned(Element.ALIGN_LEFT, ":", 263, 130, 0);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "[FLDENT] atau [FLDENT]", 273, 130, 0);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "• Rekening", 73, 120, 0);
-        canvas.showTextAligned(Element.ALIGN_LEFT, ":", 263, 120, 0);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "Rupiah", 273, 120, 0);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "Keterangan :", 73, 110, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, "PENTING:", xAddr, topY, 0);
+        topY -= 10;
+        canvas.showTextAligned(Element.ALIGN_LEFT, "- Transfer ke rekening atas nama " + model.getOwner() + " :", 70, topY, 0);
+        canvas.setFontAndSize(arial, 7f);
+        topY -= 10;
+        canvas.showTextAligned(Element.ALIGN_LEFT, "• No Rekening VA [YBANKKEY] atau [YBANKKEY]", 73, topY, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, ":", 263, topY, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, "[FLDENT] atau [FLDENT]", 273, topY, 0);
+        topY -= 10;
+        canvas.showTextAligned(Element.ALIGN_LEFT, "• Rekening", 73, topY, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, ":", 263, topY, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, "[TEST]", 273, topY, 0);
+        topY -= 10;
+        canvas.setFontAndSize(arial, 7.5f);
+        canvas.showTextAligned(Element.ALIGN_LEFT, "Keterangan :", 73, topY, 0);
+        
         canvas.endText();
         
         float leftX  = 86;
         float rightX = 568;
-        float topY   = 110;
         float bottomY = 0;
-        
+
         Font checkFont = new Font(Font.FontFamily.ZAPFDINGBATS, 7.5f);
         Font textFont  = new Font(arial, 7.5f);
+        Font boldFont  = new Font(arialBold, 7.5f);
 
         float symbolWidth = 10f;
 
@@ -293,24 +409,38 @@ public class CreatePdfPTP implements BasePdfGenerator{
         
         p.add(new Chunk("4  ", checkFont));
         
-        p.add(
-            "Nomor rekening yang tertera di atas hanya berlaku untuk pembayaran Premi/Kontribusi no. Polis [CHDRNUM] dan nomor tersebut adalah " +
-            "nomor personal Identifikasi Anda serta tidak boleh diinformasikan kepada orang lain."
-        );
+        p.add(new Chunk(
+            "Nomor rekening yang tertera di atas hanya berlaku untuk pembayaran Premi/Kontribusi no. Polis ",
+            textFont
+        ));
+        p.add(new Chunk(
+            model.getChdrnum(),
+            boldFont
+        ));
+        p.add(new Chunk(
+            " dan nomor tersebut adalah nomor personal Identifikasi Anda serta tidak boleh diinformasikan kepada orang lain.",
+            textFont
+        ));
 
         ColumnText ct = new ColumnText(canvas);
         ct.setSimpleColumn(leftX, bottomY, rightX, topY);
         ct.addElement(p);
         ct.go();
+
+        topY -= 20;
         
         String end = "[b]Perhatian!![/b] PT AIA FINANCIAL tidak pernah bekerjasama atau menunjuk pihak manapun untuk melakukan penagihan, menarik, menerima atau " +
                 "mengumpulkan uang untuk pembayaran Premi/Kontribusi. Setiap pembayaran Premi/Kontribusi TIDAK diperkenankan secara tunai, harus dilakukan " +
                 "secara transfer ke rekening atas nama PT AIA FINANCIAL dengan detail rekening sebagaimana disebut di atas.";
         
-        txt.writeParagraph(end, document, xAddr, bottomY, rightX, 90, canvas, arialItalic, 7.5f, 1.2f);
+        txt.writeParagraph(end, document, xAddr, bottomY, rightX, topY, canvas, arialItalic, 7f, 1.2f);
 
         document.close();
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    private boolean hasText(String s) {
+        return s != null && !s.trim().isEmpty();
     }
     
     private void getCurrentDir(){
@@ -321,6 +451,33 @@ public class CreatePdfPTP implements BasePdfGenerator{
         } catch (IOException ex) {
             Logger.getLogger(CreatePdfAPH.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    private static final Set<String> PRIORITY_TYPES =
+            Set.of("BSR");
+    
+    public boolean isPriority(BaseModel model){
+        String cntType = model.getCnttype();
+        if(cntType == null){
+            return false;
+        }
+        return PRIORITY_TYPES.contains(cntType);
+    }
+    
+    public String getFileName(){
+        return fileName;
+    }
+    
+    public String getBarcodes(){
+        return barcode;
+    }
+    
+    public float getYaddr(){
+        return yAddr;
+    }
+    
+    public float getXbox(){
+        return boxCenterX;
     }
     
 }

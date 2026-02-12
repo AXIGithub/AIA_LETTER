@@ -12,36 +12,20 @@ import aia.model.BaseModel;
  * @author Ratino
  */
 public class KppaModel extends BaseModel{
-    private String policyNo;
     private String cownnum;
-    private String zowner;
     private String cltphone01;
     private String cltphone02;
     private String ctrycode;
     private String zmrktcde;
     private String lifcnum;
     private String zname;
-    private String cnttype;
     private String srcebus;
-    private String occdate;
-    private String statcode;
-    private String billfreq;
     private String premi;
     private String instfrom;
     private String ptd;
     private String transDate;
     private String period;
     private String nldKSts;
-    private String email;
-    private String phonecell;
-
-    public String getPolicyNo() {
-        return policyNo;
-    }
-
-    public void setPolicyNo(String policyNo) {
-        this.policyNo = policyNo;
-    }
 
     public String getCownnum() {
         return cownnum;
@@ -49,14 +33,6 @@ public class KppaModel extends BaseModel{
 
     public void setCownnum(String cownnum) {
         this.cownnum = cownnum;
-    }
-
-    public String getZowner() {
-        return zowner;
-    }
-
-    public void setZowner(String zowner) {
-        this.zowner = zowner;
     }
 
     public String getCltphone01() {
@@ -107,44 +83,12 @@ public class KppaModel extends BaseModel{
         this.zname = zname;
     }
 
-    public String getCnttype() {
-        return cnttype;
-    }
-
-    public void setCnttype(String cnttype) {
-        this.cnttype = cnttype;
-    }
-
     public String getSrcebus() {
         return srcebus;
     }
 
     public void setSrcebus(String srcebus) {
         this.srcebus = srcebus;
-    }
-
-    public String getOccdate() {
-        return occdate;
-    }
-
-    public void setOccdate(String occdate) {
-        this.occdate = occdate;
-    }
-
-    public String getStatcode() {
-        return statcode;
-    }
-
-    public void setStatcode(String statcode) {
-        this.statcode = statcode;
-    }
-
-    public String getBillfreq() {
-        return billfreq;
-    }
-
-    public void setBillfreq(String billfreq) {
-        this.billfreq = billfreq;
     }
 
     public String getPremi() {
@@ -193,22 +137,6 @@ public class KppaModel extends BaseModel{
 
     public void setNldKSts(String nldKSts) {
         this.nldKSts = nldKSts;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPhonecell() {
-        return phonecell;
-    }
-
-    public void setPhonecell(String phonecell) {
-        this.phonecell = phonecell;
     }
     
     

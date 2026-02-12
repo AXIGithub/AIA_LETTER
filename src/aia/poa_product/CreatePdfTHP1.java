@@ -7,18 +7,16 @@ package aia.poa_product;
 
 import aia.controller.BasePdfGenerator;
 import aia.controller.TextModification;
-import aia.model.PolisModel;
+import aia.model.BaseModel;
+import aia.model.productMapping.Thp1Model;
 import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
-import com.itextpdf.text.ListItem;
 import com.itextpdf.text.PageSize;
-import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
+import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.BaseFont;
-import com.itextpdf.text.pdf.ColumnText;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfImportedPage;
 import com.itextpdf.text.pdf.PdfPCell;
@@ -29,8 +27,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  *
@@ -45,36 +46,53 @@ public class CreatePdfTHP1 implements BasePdfGenerator{
     
     private BaseFont arial;
     private BaseFont arialItalic;
-    private BaseFont arialBold;    
-    private BaseFont barcodeFont;
-    private float yAddr = 312;
-    private float xAddr = 48;
-    private float yInfo = 317;
-    private float xInfo = 270;
-    private float xDot = 381;
-    private float xDataInfo = 386;
+    private BaseFont arialBold;
+    private float yAddr;
+    private float xAddr;
+    private float yInfo;
+    private float xInfo;
+    private float xDot;
+    private float xDataInfo;
+    private float boxCenterX;
     
     private String currDir = new String();
     private String paperDir = new String();
     private String dirFonts = new String();
     private String sortingDir = new String();
     private String outputDir = new String();
-    
-    
+    private String fileName = new String();
+    private String barcode = new String();
 
     @Override
-    public void generate(PolisModel polisModel, String product, String[] params) throws Exception {
+    public void generate(List<BaseModel> dataList, String product, String cetak, String[] params) throws Exception {
+        if (dataList.isEmpty()) {
+            throw new IllegalArgumentException("Data kosong");
+        }
+
+        BaseModel first = dataList.get(0);
+        
+        if(!(first instanceof Thp1Model)){
+            throw new IllegalArgumentException("Not Thp1 Model");
+        }
+        
+        Thp1Model model = (Thp1Model) first;
+        yAddr = 312;
+        xAddr = 48;
+        yInfo = 312;
+        xInfo = 272;
+        xDot = 381;
+        xDataInfo = 386;
         sortingDir = params[2];
         getCurrentDir();
         Document document = new Document(PageSize.A5.rotate());
         PdfWriter writer = PdfWriter.getInstance(document,
-                new FileOutputStream(sortingDir + product + "_" + polisModel.getChdrnum() + ".pdf"));
+                new FileOutputStream(sortingDir + product + "_" + model.getChdrnum() + ".pdf"));
         
         dataReaderPreprinted = new PdfReader(paperDir + "PAPER SRN.pdf");
 
         document.open();
         PdfContentByte canvas = writer.getDirectContent();
-        PdfPTable table = new PdfPTable(5);
+        PdfPTable table = new PdfPTable(2);
         
         canvas.beginText();
         canvas.endText();
@@ -89,228 +107,230 @@ public class CreatePdfTHP1 implements BasePdfGenerator{
         arialBold = BaseFont.createFont(dirFonts + "arial_bold.ttf", BaseFont.IDENTITY_H, true);
         
         canvas.beginText();
-        canvas.setFontAndSize(arial, 6.5f);
+        canvas.setFontAndSize(arial, 8.5f);
 
         // ================= HEADER =======================
         canvas.showTextAligned(Element.ALIGN_LEFT, "Kepada yang terhormat :", xAddr, yAddr, 0);
         yAddr = (float) (yAddr - 10);
-        canvas.setFontAndSize(arialBold, 8.5f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "Bapak/Ibu [owner]", xAddr, yAddr, 0);
-        yAddr = (float) (yAddr - 10);
-        canvas.setFontAndSize(arial, 8.5f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "[alamat1]", xAddr, yAddr, 0);
-        yAddr = (float) (yAddr - 10);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "[alamat2]" + " " + "[alamat3]", xAddr, yAddr, 0);
-        yAddr = (float) (yAddr - 10);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "[alamat4]" + " " + "[alamat5]", xAddr, yAddr, 0);
-        yAddr = (float) (yAddr - 10);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "[kodePos]", xAddr, yAddr, 0);
+        canvas.setFontAndSize(arialBold, 8f);
+        
+        String owner = model.getOwner(); 
+        String owner1 = owner;
+        String owner2 = "";
+        
+        String[] split = owner.split(" "); 
+        
+        if (owner.length() > 25) {
+            StringBuilder sb1 = new StringBuilder();
+            StringBuilder sb2 = new StringBuilder();
+
+            for (int i = 0; i < split.length; i++) {
+                if (i <= 1) { 
+                    sb1.append(split[i]).append(" ");
+                } else {
+                    sb2.append(split[i]).append(" ");
+                }
+            }
+
+            owner1 = sb1.toString().trim();
+            owner2 = sb2.toString().trim();
+        }
+        
+        canvas.showTextAligned(Element.ALIGN_LEFT, "Bapak/Ibu " + owner1, xAddr, yAddr, 0);
+        yAddr -= 10;
+        if (!owner2.isEmpty()) {
+            canvas.showTextAligned(Element.ALIGN_LEFT, owner2, xAddr, yAddr, 0);
+            yAddr -= 10;
+        }
+        
+        int emptyCount = 0;
+        if (!hasText(model.getAddr01())) emptyCount++;
+        if (!hasText(model.getAddr02())) emptyCount++;
+        if (!hasText(model.getAddr03())) emptyCount++;
+        if (!hasText(model.getAddr04())) emptyCount++;
+        if (!hasText(model.getAddr05())) emptyCount++;
+
+        List<String> addressLines = new ArrayList<>();
+
+        if (emptyCount >= 2) {
+            if (hasText(model.getAddr01())) {
+                addressLines.add(model.getAddr01());
+            }
+
+            String line23 = Stream.of(model.getAddr02(), model.getAddr03())
+                    .filter(this::hasText)
+                    .collect(Collectors.joining(" "));
+            if (!line23.isEmpty()) {
+                addressLines.add(line23);
+            }
+
+            String line45 = Stream.of(model.getAddr04(), model.getAddr05())
+                    .filter(this::hasText)
+                    .collect(Collectors.joining(" "));
+            if (!line45.isEmpty()) {
+                addressLines.add(line45);
+            }
+
+        } else {
+            if (hasText(model.getAddr01())) addressLines.add(model.getAddr01());
+            if (hasText(model.getAddr02())) addressLines.add(model.getAddr02());
+            if (hasText(model.getAddr03())) addressLines.add(model.getAddr03());
+            if (hasText(model.getAddr04())) addressLines.add(model.getAddr04());
+            if (hasText(model.getAddr05())) addressLines.add(model.getAddr05());
+        }
+        
+        if (hasText(model.getPcode())) {
+            addressLines.add(model.getPcode());
+        }
+        
+        canvas.setFontAndSize(arial, 8f);
+        for (String line : addressLines) {
+            canvas.showTextAligned(Element.ALIGN_LEFT, line, xAddr, yAddr, 0);
+            yAddr -= 10;
+        }
 
         // ================= INFO POLIS =====================
-        // No Polis
-        canvas.setFontAndSize(arial, 8f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "No. Polis", xInfo, yInfo, 0);
-        canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
-        canvas.setFontAndSize(arialBold, 8f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "[CHDRNUM]", xDataInfo, yInfo, 0);
-        yInfo -= 11;
+        
+        canvas.setFontAndSize(arialBold, 9.5f);
+        canvas.showTextAligned(Element.ALIGN_LEFT,
+                "LAPORAN INVESTASI MANFAAT BERTAHAP", xInfo, yInfo, 0);
+        yInfo -= 16;
 
         // Nama Produk
-        canvas.setFontAndSize(arial, 8f);
+        canvas.setFontAndSize(arial, 8.5f);
         canvas.showTextAligned(Element.ALIGN_LEFT, "Nama Produk", xInfo, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
-        canvas.setFontAndSize(arialBold, 8f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "[PROD_NAME]", xDataInfo, yInfo, 0);
-        yInfo -= 11;
-
-        // Nama Tertanggung/Peserta
-        canvas.setFontAndSize(arial, 8f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "Nama Tertanggung/Peserta", xInfo, yInfo, 0);
+        canvas.setFontAndSize(arialBold, 8.5f);
+        canvas.showTextAligned(Element.ALIGN_LEFT, model.getProdName(), xDataInfo, yInfo, 0);
+        yInfo -= 11.5;
+        
+        // No Polis
+        canvas.setFontAndSize(arial, 8.5f);
+        canvas.showTextAligned(Element.ALIGN_LEFT, "No. Polis", xInfo, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
-        canvas.setFontAndSize(arialBold, 8f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "[NAME]", xDataInfo, yInfo, 0);
-        yInfo -= 11;
+        canvas.setFontAndSize(arialBold, 8.5f);
+        canvas.showTextAligned(Element.ALIGN_LEFT, model.getChdrnum(), xDataInfo, yInfo, 0);
+        yInfo -= 11.5;
 
         // Mata Uang
-        canvas.setFontAndSize(arial, 8f);
+        canvas.setFontAndSize(arial, 8.5f);
+        String currency = model.getCntcurr().equalsIgnoreCase("IRP") ? "Rupiah" : "Dollar Amerika";
+        String kode = model.getCntcurr().equalsIgnoreCase("IRP") ? model.getCntcurr() : "USD";
         canvas.showTextAligned(Element.ALIGN_LEFT, "Mata Uang", xInfo, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
-        canvas.setFontAndSize(arialBold, 8f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "[mataUang]", xDataInfo, yInfo, 0);
-        yInfo -= 11;
-
-        // Uang Pertanggungan Dasar
-        canvas.setFontAndSize(arial, 8f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "Uang Pertanggungan Dasar", xInfo, yInfo, 0);
-        canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
-        canvas.setFontAndSize(arialBold, 8f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "[SUMINS]", xDataInfo, yInfo, 0);
-        yInfo -= 11;
-
-        // Tanggal Mulai Asuransi
-        canvas.setFontAndSize(arial, 8f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "Tanggal Mulai Asuransi", xInfo, yInfo, 0);
-        canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
-        canvas.setFontAndSize(arialBold, 8f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "[OCCDATE]", xDataInfo, yInfo, 0);
-        yInfo -= 11;
-        
-        // Status Polis
-        canvas.setFontAndSize(arial, 8f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "Status Polis", xInfo, yInfo, 0);
-        canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
-        canvas.setFontAndSize(arialBold, 8f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "[statusPolis]", xDataInfo, yInfo, 0);
-        yInfo -= 11;
-        
-        // Tanggal Cetak
-        canvas.setFontAndSize(arial, 8f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "Tanggal Cetak", xInfo, yInfo, 0);
-        canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
-        canvas.setFontAndSize(arialBold, 8f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "[tanggalCetak]" , xDataInfo, yInfo, 0);
-
-
-        // ========== PERIHAL ===========================
         canvas.setFontAndSize(arialBold, 8.5f);
-        canvas.showTextAligned(Element.ALIGN_LEFT,
-                "Perihal : Pemberitahuan Jatuh Tempo", xAddr, 201, 0);
-        canvas.setFontAndSize(arialBold, 8f);
-        canvas.showTextAligned(Element.ALIGN_RIGHT,
-                "Jakarta, " + "[tanggalCetak]" , 544, 201, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, currency, xDataInfo, yInfo, 0);
+        yInfo -= 11.5;
+
+        // Uang Pertanggungan
+        canvas.setFontAndSize(arial, 8.5f);
+        canvas.showTextAligned(Element.ALIGN_LEFT, "Uang Pertanggungan", xInfo, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
+        canvas.setFontAndSize(arialBold, 8.5f);
+        canvas.showTextAligned(Element.ALIGN_LEFT, txt.setCurrencyIdr(model.getSumins()), xDataInfo, yInfo, 0);
         canvas.endText();
         
         // ===================== ISI SURAT ==========================
-        
-        table.setTotalWidth(new float[] {75, 90, 150, 110, 90});
+        int topY = 197;
+        Font fontArialBold = new Font(arialBold, 8.5f);
+        table.setTotalWidth(new float[] {400, 90});
         table.setLockedWidth(true);
         
-        //Header
-        PdfPCell header1 = new PdfPCell(new Phrase("Periode Bayar", new Font(arialBold, 7.5f)));
-        header1.setBackgroundColor(new BaseColor(150, 150, 150));
-        header1.setPadding(4);
-        header1.setHorizontalAlignment(Element.ALIGN_CENTER);
+        PdfPCell header1 = new PdfPCell(new Phrase("Keterangan", fontArialBold));
+        header1.setBackgroundColor(new BaseColor(255, 255, 255));
+        header1.setPaddingLeft(6);
+        header1.setHorizontalAlignment(Element.ALIGN_LEFT);
+        header1.setBorder(Rectangle.LEFT |Rectangle.BOTTOM | Rectangle.TOP);
         header1.setVerticalAlignment(Element.ALIGN_MIDDLE);
         
-        PdfPCell header2 = new PdfPCell(new Phrase("Tgl. Jatuh Tempo", new Font(arialBold, 7.5f)));
-        header2.setBackgroundColor(new BaseColor(150, 150, 150));
-        header2.setPadding(4);
-        header2.setHorizontalAlignment(Element.ALIGN_CENTER);
+        PdfPCell header2 = new PdfPCell(new Phrase("Jumlah (" + kode + ")", fontArialBold));
+        header2.setBackgroundColor(new BaseColor(255, 255, 255));
+        header2.setPaddingRight(10);
+        header2.setHorizontalAlignment(Element.ALIGN_RIGHT);
         header2.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        
-        PdfPCell header3 = new PdfPCell(new Phrase("Premi/kontribusi", new Font(arialBold, 7.5f)));
-        header3.setBackgroundColor(new BaseColor(150, 150, 150));
-        header3.setPadding(4);
-        header3.setHorizontalAlignment(Element.ALIGN_CENTER);
-        header3.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        
-        PdfPCell header4 = new PdfPCell(new Phrase("Titipan Premi/Kontribusi", new Font(arialBold, 7.5f)));
-        header4.setBackgroundColor(new BaseColor(150, 150, 150));
-        header4.setPadding(4);
-        header4.setHorizontalAlignment(Element.ALIGN_CENTER);
-        header4.setVerticalAlignment(Element.ALIGN_MIDDLE);
-        
-        PdfPCell header5 = new PdfPCell(new Phrase("Total Premi/Kontribusi", new Font(arialBold, 7.5f)));
-        header5.setBackgroundColor(new BaseColor(150, 150, 150));
-        header5.setPadding(4);
-        header5.setHorizontalAlignment(Element.ALIGN_CENTER);
-        header5.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        header2.setBorder(Rectangle.RIGHT |Rectangle.BOTTOM | Rectangle.TOP);
         
         table.addCell(header1);
         table.addCell(header2);
-        table.addCell(header3);
-        table.addCell(header4);
-        table.addCell(header5);
         
         List<String[]> listData = new ArrayList<>();
-        listData.add(new String[]{"[periodeBayar]", "[INSTFROM]", "[SINSTAMT]", "[ZVPFEE]", "[TOTALPREMI]"});
+        List<String[]> alocamtData = new ArrayList<>();
         
-        Font fontArial = new Font(arial, 7.5f);
+        listData.add(new String[]{"Akumulasi manfaat bertahap periode sebelumnya"});
+        listData.add(new String[]{"Akumulasi bunga S/D " + txt.convertDateMM(model.getZinnto())});
+        listData.add(new String[]{"Manfaat bertahap " + txt.convertDateMM(model.getLreqdate())});
         
-        for (String[] row : listData) {
-            PdfPCell c1 = new PdfPCell(new Phrase(row[0], fontArial));
-            c1.setHorizontalAlignment(Element.ALIGN_CENTER);
+        alocamtData.add(new String[]{txt.setCurrencyIdr(model.getAlocamt01())});
+        alocamtData.add(new String[]{txt.setCurrencyIdr(model.getAlocamt02())});
+        alocamtData.add(new String[]{txt.setCurrencyIdr(model.getAlocamt03())});
+        
+        PdfPCell spacer = new PdfPCell(new Phrase(" "));
+        spacer.setColspan(2);
+        spacer.setBorder(Rectangle.NO_BORDER);
+        spacer.setFixedHeight(6); // ini yang bikin jarak rapi
+
+        table.addCell(spacer);
+        
+        for (int i = 0; i < listData.size(); i++) {
+            PdfPCell c1 = new PdfPCell(
+                    new Phrase(listData.get(i)[0], fontArialBold)
+            );
+            c1.setHorizontalAlignment(Element.ALIGN_LEFT);
             c1.setVerticalAlignment(Element.ALIGN_MIDDLE);
-            c1.setPadding(6);
-            table.addCell(c1);
-                    
-            PdfPCell c2 = new PdfPCell(new Phrase(row[1], fontArial));
-            c2.setHorizontalAlignment(Element.ALIGN_CENTER);
+            c1.setBorder(Rectangle.NO_BORDER);
+            c1.setPaddingTop(1);
+            c1.setPaddingLeft(10);
+            c1.setPaddingRight(4);
+            c1.setPaddingBottom(1);
+            
+            PdfPCell c2 = new PdfPCell(
+                    new Phrase(alocamtData.get(i)[0], fontArialBold)
+            );
+            c2.setHorizontalAlignment(Element.ALIGN_RIGHT);
             c2.setVerticalAlignment(Element.ALIGN_MIDDLE);
-            c2.setPadding(6);
+            c2.setBorder(Rectangle.NO_BORDER);
+            c2.setPaddingTop(1);
+            c2.setPaddingLeft(4);
+            c2.setPaddingRight(10);
+            c2.setPaddingBottom(1);
+            
+            table.addCell(c1);
             table.addCell(c2);
-
-            PdfPCell c3 = new PdfPCell(new Phrase(row[2], fontArial));
-            c3.setHorizontalAlignment(Element.ALIGN_CENTER);
-            c3.setVerticalAlignment(Element.ALIGN_MIDDLE);
-            c3.setPadding(6);
-            table.addCell(c3);
-            
-            PdfPCell c4 = new PdfPCell(new Phrase(row[3], fontArial));
-            c4.setHorizontalAlignment(Element.ALIGN_CENTER);
-            c4.setVerticalAlignment(Element.ALIGN_MIDDLE);
-            c4.setPadding(6);
-            table.addCell(c4);
-            
-            PdfPCell c5 = new PdfPCell(new Phrase(row[4], fontArial));
-            c5.setHorizontalAlignment(Element.ALIGN_CENTER);
-            c5.setVerticalAlignment(Element.ALIGN_MIDDLE);
-            c5.setPadding(6);
-            table.addCell(c5);
-
         }
-        table.writeSelectedRows(0, -1, xAddr, 197, canvas);
+        PdfPCell spacer2 = new PdfPCell(new Phrase(" "));
+        spacer2.setColspan(2);
+        spacer2.setBorder(Rectangle.NO_BORDER);
+        spacer2.setFixedHeight(6);
+
+        table.addCell(spacer2);
+        
+        PdfPCell t1 = new PdfPCell(new Phrase("Saldo Akhir", fontArialBold));
+        t1.setHorizontalAlignment(Element.ALIGN_LEFT);
+        t1.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        t1.setBorder(Rectangle.LEFT |Rectangle.BOTTOM | Rectangle.TOP);
+        t1.setPaddingLeft(6);
+        table.addCell(t1);
+        
+        PdfPCell t2 = new PdfPCell(new Phrase(txt.setCurrencyIdr(model.getAlocamt04()), fontArialBold));
+        t2.setHorizontalAlignment(Element.ALIGN_RIGHT);
+        t2.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        t2.setBorder(Rectangle.RIGHT |Rectangle.BOTTOM | Rectangle.TOP);
+        t2.setPaddingRight(10);
+        table.addCell(t2);
+        table.writeSelectedRows(0, -1, xAddr, topY, canvas);
+        topY -= 90;
         
         canvas.beginText();
-        canvas.setFontAndSize(arial, 7.5f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "Pembayaran Premi/Kontribusi melalui:", xAddr, 150, 0);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "- Transfer ke rekening atas nama [OWNER] :", 70, 140, 0);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "• No Rekening VA [YBANKKEY] atau [YBANKKEY]", 73, 130, 0);
-        canvas.showTextAligned(Element.ALIGN_LEFT, ":", 263, 130, 0);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "[FLDENT] atau [FLDENT]", 273, 130, 0);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "• Rekening", 73, 120, 0);
-        canvas.showTextAligned(Element.ALIGN_LEFT, ":", 263, 120, 0);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "Rupiah", 273, 120, 0);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "Keterangan :", 73, 110, 0);
+        canvas.setFontAndSize(arial, 8.5f);
+        canvas.showTextAligned(Element.ALIGN_LEFT, "Jakarta, " + txt.convertDateMM(cetak), xAddr, topY, 0);
         canvas.endText();
-        
-        float leftX  = 86;
-        float rightX = 568;
-        float topY   = 110;
-        float bottomY = 0;
-        
-        Font checkFont = new Font(Font.FontFamily.ZAPFDINGBATS, 7.5f);
-        Font textFont  = new Font(arial, 7.5f);
-
-        float symbolWidth = 10f;
-
-        Paragraph p = new Paragraph();
-        p.setFont(textFont);
-        p.setLeading(8f);
-        
-        p.setIndentationLeft(symbolWidth);
-        p.setFirstLineIndent(-symbolWidth);
-        
-        p.add(new Chunk("4  ", checkFont));
-        
-        p.add(
-            "Nomor rekening yang tertera di atas hanya berlaku untuk pembayaran Premi/Kontribusi no. Polis [CHDRNUM] dan nomor tersebut adalah " +
-            "nomor personal Identifikasi Anda serta tidak boleh diinformasikan kepada orang lain."
-        );
-
-        ColumnText ct = new ColumnText(canvas);
-        ct.setSimpleColumn(leftX, bottomY, rightX, topY);
-        ct.addElement(p);
-        ct.go();
-        
-        String end = "[b]Perhatian!![/b] PT AIA FINANCIAL tidak pernah bekerjasama atau menunjuk pihak manapun untuk melakukan penagihan, menarik, menerima atau " +
-                "mengumpulkan uang untuk pembayaran Premi/Kontribusi. Setiap pembayaran Premi/Kontribusi TIDAK diperkenankan secara tunai, harus dilakukan " +
-                "secara transfer ke rekening atas nama PT AIA FINANCIAL dengan detail rekening sebagaimana disebut di atas.";
-        
-        txt.writeParagraph(end, document, xAddr, bottomY, rightX, 90, canvas, arialItalic, 7.5f, 1.2f);
 
         document.close();
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    private boolean hasText(String s) {
+        return s != null && !s.trim().isEmpty();
     }
     
     private void getCurrentDir(){
@@ -323,4 +343,30 @@ public class CreatePdfTHP1 implements BasePdfGenerator{
         }
     }
     
+    private static final Set<String> PRIORITY_TYPES =
+            Set.of("kosong");
+    
+    public boolean isPriority(BaseModel model){
+        String cntType = model.getCnttype();
+        if(cntType == null){
+            return false;
+        }
+        return PRIORITY_TYPES.contains(cntType);
+    }
+    
+    public String getFileName(){
+        return fileName;
+    }
+    
+    public String getBarcodes(){
+        return barcode;
+    }
+    
+    public float getYaddr(){
+        return yAddr;
+    }
+    
+    public float getXbox(){
+        return boxCenterX;
+    }
 }

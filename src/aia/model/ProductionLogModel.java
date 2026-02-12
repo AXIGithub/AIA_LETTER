@@ -71,11 +71,11 @@ public class ProductionLogModel {
                     "s5 INT NOT NULL, s6 VARCHAR(100), product_name VARCHAR(100) NOT NULL, courier_name VARCHAR(100) NOT NULL, seq_page INT NOT NULL, seq_customer INT NOT NULL, " +
                     "seq_envelope INT NOT NULL, ss1 VARCHAR(100) NOT NULL, ss2 VARCHAR(100) NOT NULL, ss3 VARCHAR(100) NOT NULL, ss4 VARCHAR(100) NOT NULL, ss5 VARCHAR(100) NOT NULL, ss6 VARCHAR(100) NOT NULL) ENGINE = MYISAM");
         stmt.executeUpdate("ALTER TABLE t_log ADD INDEX tb_log_index1 (barcode)");
-        stmt.executeUpdate("ALTER TABLE t_log ADD INDEX tb_log_index2 (id_customer)");        
+        stmt.executeUpdate("ALTER TABLE t_log ADD INDEX tb_log_index2 (id_customer)");
     }
     
     public void uploadToDatabase(String path, Statement stmt) throws SQLException{
-        stmt.executeUpdate("TRUNCATE TABLE T_LOG");
+        stmt.executeUpdate("TRUNCATE TABLE t_log");
         System.out.println("LOAD DATA INFILE '" + path +"' INTO TABLE t_log (barcode,id_customer,name1,name2,name3,address1,address2,address3,address4,address5,address6,b1,b2,b3,b4,b5,b6,s1,s2,s3,s4,s5,s6,product_name,courier_name,seq_page,seq_customer,seq_envelope,ss1,ss2,ss3,ss4,ss5,ss6)");
         stmt.executeUpdate("LOAD DATA INFILE '" + path +"' INTO TABLE t_log (barcode,id_customer,name1,name2,name3,address1,address2,address3,address4,address5,address6,b1,b2,b3,b4,b5,b6,s1,s2,s3,s4,s5,s6,product_name,courier_name,seq_page,seq_customer,seq_envelope,ss1,ss2,ss3,ss4,ss5,ss6)");
     }

@@ -7,20 +7,20 @@ package aia.poa_product;
 
 import aia.controller.BasePdfGenerator;
 import aia.controller.TextModification;
-import aia.model.PolisModel;
+import aia.model.BaseModel;
+import aia.model.productMapping.AcdModel;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Element;
-import com.itextpdf.text.Font;
 import com.itextpdf.text.PageSize;
-import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.BaseFont;
-import com.itextpdf.text.pdf.ColumnText;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfImportedPage;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,30 +37,43 @@ public class CreatePdfDVD1 implements BasePdfGenerator{
     
     private BaseFont arial;
     private BaseFont arialUnderline;
-    private BaseFont arialBold;    
-    private BaseFont barcodeFont;
+    private BaseFont arialBold;
     private float yAddr = 712;
     private float xAddr = 72;
     private float yInfo = 717;
     private float xInfo = 296;
     private float xDot = 430;
     private float xDataInfo = 437;
+    private float boxCenterX;
     
     private String currDir = new String();
     private String paperDir = new String();
     private String dirFonts = new String();
     private String sortingDir = new String();
     private String outputDir = new String();
+    private String fileName = new String();
+    private String barcode = new String();
     
     
 
     @Override
-    public void generate(PolisModel polisModel, String product, String[] params) throws Exception {
+    public void generate(List<BaseModel> dataList, String product, String cetak, String[] params) throws Exception {
+        if (dataList.isEmpty()) {
+            throw new IllegalArgumentException("Data kosong");
+        }
+
+        BaseModel first = dataList.get(0);
+        
+        if(!(first instanceof AcdModel)){
+            throw new IllegalArgumentException("Not Epml Model");
+        }
+        
+        AcdModel model = (AcdModel) first;
         sortingDir = params[2];
         getCurrentDir();
         Document document = new Document(PageSize.A4);
         PdfWriter writer = PdfWriter.getInstance(document,
-                new FileOutputStream(sortingDir + product + "_" + polisModel.getChdrnum() + ".pdf"));
+                new FileOutputStream(sortingDir + product + "_" + model.getChdrnum() + ".pdf"));
         
         dataReaderPreprinted = new PdfReader(paperDir + "PAPER AIA.pdf");
 
@@ -136,7 +149,7 @@ public class CreatePdfDVD1 implements BasePdfGenerator{
         yInfo -= 10.5;
 
         // Periode pembayaran
-        String periode = polisModel.getBillfreq().equals("12") ? "Bulanan" : polisModel.getBillfreq();
+        String periode = model.getBillFreq().equals("12") ? "Bulanan" : model.getBillFreq();
         canvas.showTextAligned(Element.ALIGN_LEFT, "Periode Pembayaran", xInfo, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, ":", xDot, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_LEFT, "[periode]", xDataInfo, yInfo, 0);
@@ -159,9 +172,9 @@ public class CreatePdfDVD1 implements BasePdfGenerator{
         
         // ===================== ISI SURAT ==========================
 
-        int topY = 550;   // posisi atas kolom
-        int bottomY = 50; // posisi bawah kolom   
-        int rightX = 545; // Posisi kanan kolom
+        int topY = 550;
+        int bottomY = 50;   
+        int rightX = 545;
         
         String paragraph = "Dengan Hormat,\n" + "\n" +
                 "Terima kasih atas kepercayaan Anda telah memilih PT AIA FINANCIAL (AIA) sebagai penyedia kebutuhan asuransi bagi Anda dan keluarga.\n" + "\n" +
@@ -206,6 +219,33 @@ public class CreatePdfDVD1 implements BasePdfGenerator{
         } catch (IOException ex) {
             Logger.getLogger(CreatePdfAPH.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    private static final Set<String> PRIORITY_TYPES =
+            Set.of("kosong");
+    
+    public boolean isPriority(BaseModel model){
+        String cntType = model.getCnttype();
+        if(cntType == null){
+            return false;
+        }
+        return PRIORITY_TYPES.contains(cntType);
+    }
+    
+    public String getFileName(){
+        return fileName;
+    }
+    
+    public String getBarcodes(){
+        return barcode;
+    }
+    
+    public float getYaddr(){
+        return yAddr;
+    }
+    
+    public float getXbox(){
+        return boxCenterX;
     }
     
 }

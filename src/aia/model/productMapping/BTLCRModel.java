@@ -12,26 +12,15 @@ import aia.model.BaseModel;
  * @author Ratino
  */
 public class BTLCRModel extends BaseModel{
-   private String owner;
    private String amount;
    private String bankToName;
    private String bankToAcc;
    private String paidTo;
-   private String cnttype;
-   private String cntcurr;
-   private String statcode;
-   private String alamat1;
-   private String alamat2;
-   private String alamat3;
-   private String alamat4;
-   private String alamat5;
-   private String cltpcode;
    private String ptrneff04;
    private String insured;
    private String sumIns;
    private String kodeSurat;
    private String kodeSts;
-   private String prodName;
    private String zservstat;
    private String zmrktcd;
    private String caraBayar;
@@ -40,26 +29,13 @@ public class BTLCRModel extends BaseModel{
    private String dtUpload;
    private String agentName;
    private String fundCurr;
-   private String flgSyariah;
    private String groupProd;
-   private String dteBirth;
-   private String flgEstate;
    private String sinstamt;
-   private String billfreq;
-   private String occdate;
    private String activeInd;
    private String lifcName01;
    private String lifcName02;
    private String lifcName03;
    private String lifcName04;
-
-    public String getOwner() {
-        return owner;
-    }
-
-    public void setOwner(String owner) {
-        this.owner = owner;
-    }
 
     public String getAmount() {
         return amount;
@@ -91,78 +67,6 @@ public class BTLCRModel extends BaseModel{
 
     public void setPaidTo(String paidTo) {
         this.paidTo = paidTo;
-    }
-
-    public String getCnttype() {
-        return cnttype;
-    }
-
-    public void setCnttype(String cnttype) {
-        this.cnttype = cnttype;
-    }
-
-    public String getCntcurr() {
-        return cntcurr;
-    }
-
-    public void setCntcurr(String cntcurr) {
-        this.cntcurr = cntcurr;
-    }
-
-    public String getStatcode() {
-        return statcode;
-    }
-
-    public void setStatcode(String statcode) {
-        this.statcode = statcode;
-    }
-
-    public String getAlamat1() {
-        return alamat1;
-    }
-
-    public void setAlamat1(String alamat1) {
-        this.alamat1 = alamat1;
-    }
-
-    public String getAlamat2() {
-        return alamat2;
-    }
-
-    public void setAlamat2(String alamat2) {
-        this.alamat2 = alamat2;
-    }
-
-    public String getAlamat3() {
-        return alamat3;
-    }
-
-    public void setAlamat3(String alamat3) {
-        this.alamat3 = alamat3;
-    }
-
-    public String getAlamat4() {
-        return alamat4;
-    }
-
-    public void setAlamat4(String alamat4) {
-        this.alamat4 = alamat4;
-    }
-
-    public String getAlamat5() {
-        return alamat5;
-    }
-
-    public void setAlamat5(String alamat5) {
-        this.alamat5 = alamat5;
-    }
-
-    public String getCltpcode() {
-        return cltpcode;
-    }
-
-    public void setCltpcode(String cltpcode) {
-        this.cltpcode = cltpcode;
     }
 
     public String getPtrneff04() {
@@ -203,14 +107,6 @@ public class BTLCRModel extends BaseModel{
 
     public void setKodeSts(String kodeSts) {
         this.kodeSts = kodeSts;
-    }
-
-    public String getProdName() {
-        return prodName;
-    }
-
-    public void setProdName(String prodName) {
-        this.prodName = prodName;
     }
 
     public String getZservstat() {
@@ -277,14 +173,6 @@ public class BTLCRModel extends BaseModel{
         this.fundCurr = fundCurr;
     }
 
-    public String getFlgSyariah() {
-        return flgSyariah;
-    }
-
-    public void setFlgSyariah(String flgSyariah) {
-        this.flgSyariah = flgSyariah;
-    }
-
     public String getGroupProd() {
         return groupProd;
     }
@@ -293,44 +181,12 @@ public class BTLCRModel extends BaseModel{
         this.groupProd = groupProd;
     }
 
-    public String getDteBirth() {
-        return dteBirth;
-    }
-
-    public void setDteBirth(String dteBirth) {
-        this.dteBirth = dteBirth;
-    }
-
-    public String getFlgEstate() {
-        return flgEstate;
-    }
-
-    public void setFlgEstate(String flgEstate) {
-        this.flgEstate = flgEstate;
-    }
-
     public String getSinstamt() {
         return sinstamt;
     }
 
     public void setSinstamt(String sinstamt) {
         this.sinstamt = sinstamt;
-    }
-
-    public String getBillfreq() {
-        return billfreq;
-    }
-
-    public void setBillfreq(String billfreq) {
-        this.billfreq = billfreq;
-    }
-
-    public String getOccdate() {
-        return occdate;
-    }
-
-    public void setOccdate(String occdate) {
-        this.occdate = occdate;
     }
 
     public String getActiveInd() {

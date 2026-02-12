@@ -11,7 +11,22 @@ package aia.model;
  */
 public class BaseModel {
     protected String chdrnum;
+    protected String chdrdue;
     protected String owner;
+    protected String cnttype;
+    protected String cntcurr;
+    protected String billFreq;
+    protected String occdate;
+    protected String statcode;
+    protected String courier;
+    protected String seqPage;
+    protected String seqCust;
+    protected String seqEnv;
+    protected String pdfname;
+    protected long id;
+    protected String yLast;
+    protected String xLast;
+    
 
     protected String addr01;
     protected String addr02;
@@ -24,7 +39,121 @@ public class BaseModel {
     protected String flgSyariah;
     protected String flgEstate;
     protected String cltEmail;
+    protected String phoneCell;
     protected String dteBirth;
+
+    public String getxLast() {
+        return xLast;
+    }
+
+    public void setxLast(String xLast) {
+        this.xLast = xLast;
+    }
+    
+    public String getyLast() {
+        return yLast;
+    }
+
+    public void setyLast(String yLast) {
+        this.yLast = yLast;
+    }
+    
+    public String getPdfname() {
+        return pdfname;
+    }
+
+    public void setPdfname(String pdfname) {
+        this.pdfname = pdfname;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+    
+    public String getSeqPage() {
+        return seqPage;
+    }
+
+    public void setSeqPage(String seqPage) {
+        this.seqPage = seqPage;
+    }
+
+    public String getSeqCust() {
+        return seqCust;
+    }
+
+    public void setSeqCust(String seqCust) {
+        this.seqCust = seqCust;
+    }
+
+    public String getSeqEnv() {
+        return seqEnv;
+    }
+
+    public void setSeqEnv(String seqEnv) {
+        this.seqEnv = seqEnv;
+    }
+    
+    public String getCnttype() {
+        return cnttype;
+    }
+
+    public void setCnttype(String cnttype) {
+        this.cnttype = cnttype;
+    }
+
+    public String getCntcurr() {
+        return cntcurr;
+    }
+
+    public void setCntcurr(String cntcurr) {
+        this.cntcurr = cntcurr;
+    }
+
+    public String getBillFreq() {
+        return billFreq;
+    }
+
+    public void setBillFreq(String billFreq) {
+        this.billFreq = billFreq;
+    }
+
+    public String getOccdate() {
+        return occdate;
+    }
+
+    public void setOccdate(String occdate) {
+        this.occdate = occdate;
+    }
+
+    public String getStatcode() {
+        return statcode;
+    }
+
+    public void setStatcode(String statcode) {
+        this.statcode = statcode;
+    }
+
+    
+    public String getChdrdue() {
+        return chdrdue;
+    }
+
+    public void setChdrdue(String chdrdue) {
+        this.chdrdue = chdrdue;
+    }
+    
+    public String getPhoneCell() {
+        return phoneCell;
+    }
+
+    public void setPhoneCell(String phoneCell) {
+        this.phoneCell = phoneCell;
+    }
 
     public String getChdrnum() {
         return chdrnum;
@@ -137,6 +266,16 @@ public class BaseModel {
     public void setFlagBca(String flagBca) {
         this.flagBca = flagBca;
     }
+
+    public String getCourier() {
+        return courier;
+    }
+
+    public void setCourier(String courier) {
+        this.courier = courier;
+    }
+    
+    
     
     
 

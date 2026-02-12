@@ -14,9 +14,7 @@ import aia.model.BaseModel;
 public class EprbModel extends BaseModel{
     private String clntnum;
     private String rmblphone;
-    private String cnttype;
     private String srcebus;
-    private String statcode;
     private String life;
     private String insured;
     private String sinstamt;

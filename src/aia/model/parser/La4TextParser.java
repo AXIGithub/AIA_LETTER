@@ -26,7 +26,7 @@ public class La4TextParser implements BaseTextParserInterface{
         model.setAddr04(c[6]);
         model.setAddr05(c[7]);
         model.setLetseqno(c[8]);
-        model.setCntcurr(c[9]);
+        model.setCnttype(c[9]);
         model.setJatuhTem(c[10]);
         model.setSinstamt01(c[11]);
         model.setZmrktcd(c[12]);
@@ -42,9 +42,9 @@ public class La4TextParser implements BaseTextParserInterface{
         model.setSumins(c[22]);
         model.setAddressLL(c[23]);
         model.setNoTelp(c[24]);
-        model.setAddr01(c[25]);
-        model.setAddr02(c[26]);
-        model.setBillfreq(c[27]);
+        model.setAddres01(c[25]);
+        model.setAddres02(c[26]);
+        model.setBillFreq(c[27]);
         model.setOccdate(c[28]);
         model.setSacscurbal(c[29]);
         model.setGroupDesc(c[30]);

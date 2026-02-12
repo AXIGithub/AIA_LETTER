@@ -14,6 +14,7 @@ import aia.model.CreateDirectoryModel;
 import com.itextpdf.text.DocumentException;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -45,6 +46,7 @@ public class View_AIA extends javax.swing.JFrame {
     private String fileName = new String();
     private String currenctDir = new String();
     private String cycle = new String();
+    private String cetak = new String();
     private String category = new String();
     public String paperDirectory = new String();
     public String fontsDirectory = new String();
@@ -62,7 +64,7 @@ public class View_AIA extends javax.swing.JFrame {
     public View_AIA() {
         initComponents();
         this.setLocationRelativeTo(null);
-        init();
+//        init();
         try {
             currenctDir = ""+new java.io.File(".").getCanonicalPath();
         } catch (IOException ex) {
@@ -273,8 +275,7 @@ public class View_AIA extends javax.swing.JFrame {
                     .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jTextDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -285,9 +286,12 @@ public class View_AIA extends javax.swing.JFrame {
                         .addComponent(jComboBox2Type, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jComboBox1SA, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton2)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGap(18, 18, 18)
+                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -297,7 +301,7 @@ public class View_AIA extends javax.swing.JFrame {
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabelDate, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 38, Short.MAX_VALUE))
+                        .addGap(0, 44, Short.MAX_VALUE))
                     .addComponent(jLabel2Icon, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -319,6 +323,11 @@ public class View_AIA extends javax.swing.JFrame {
         });
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "2IN1 BIRU", "2IN1 BIRU EMAS", "2IN1 EMAS", "2IN1 PREMIUM", "AMEX ( AX3 )", "BANK DKI EMAS ( B3 )", "BANK DKI PLATINUM ( B4 )", "BATIK AIR PLATINUM (BP)", "BATIK AIR WORLD (BW)", "BJB EMAS ( B1 )", "BJB PLATINUM ( B2 )", "BNI - XL PRIORITAS", "BNI AMEX GOLD REGULER ( GZ )", "CLIENT ( F3 )", "CORP INDIVIDU EMAS ( F )", "CORP INDIVIDU PLATINUM ( F5 )", "GARUDA PLATINUM ( J1 )", "GARUDA SIGNATURE ( J1 )", "GASOLINE ( F2 )", "INFINITE ( G9 )", "JCB EMAS ( JG )", "JCB PRECIOUS ( JC )", "JCB ULTIMATE (JU)", "KARTU KREDIT PEMERINTAH DOMESTIK (KKPD)", "KARTU TUNAI ( PC )", "LOTTE ( G1 )", "LOTTE PLATINUM ( L5 )", "MASTER WORLD ( MW )", "PERTAMINA EMAS ( PG )", "PERTAMINA PLATINUM ( PP )", "PLATINUM ( E )", "REGULER MB ( D )", "SILOAM HOSPITALS PLATINUM (SH)", "TELKOMSEL EMAS (C1)", "TELKOMSEL PLATINUM (C2)", "TITANIUM ( A1 )", "VISA SIGNATURE (VS)", "WORLDCUP BIRU ( N )", "WORLDCUP EMAS ( O )" }));
+        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBox1ActionPerformed(evt);
+            }
+        });
 
         jButton7.setText("...");
         jButton7.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -474,14 +483,19 @@ public class View_AIA extends javax.swing.JFrame {
             Processing processing = new Processing();
             ProductCode code = new ProductCode();
             this.category = jComboBox1SA.getSelectedItem().toString();
-            this.cycle = jTextDate.getText().substring(3, 5) + jTextDate.getText().substring(0, 2) + jTextDate.getText().substring(6, 10) ;
+            this.cycle = jTextDate.getText().substring(3, 5) + jTextDate.getText().substring(0, 2) + jTextDate.getText().substring(6, 10);
+            this.cetak = jTextDate.getText().substring(6,10) + jTextDate.getText().substring(3,5) + jTextDate.getText().substring(0,2);
             String department = "AIA";
             String type = code.getProductCode(fileName);
-            String[] argumens = {inputDir + fileName, inputDir, department, type, category, cycle};
-            processing.createCustody(argumens);
+            String[] argumens = {inputDir + fileName, inputDir, department, type, category, cycle, cetak, fileName};
+            processing.createPdf(argumens);
         } catch (DocumentException ex) {
             Logger.getLogger(View_AIA.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
+            Logger.getLogger(View_AIA.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(View_AIA.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
             Logger.getLogger(View_AIA.class.getName()).log(Level.SEVERE, null, ex);
         } 
     }//GEN-LAST:event_jButton2ActionPerformed
@@ -553,6 +567,10 @@ public class View_AIA extends javax.swing.JFrame {
         // TODO add your handling code here:
         jTextArea1.setText(jTextArea1.getText() + "TYPE  : " + jComboBox2Type.getSelectedItem().toString()+"\n");
     }//GEN-LAST:event_jComboBox2TypeActionPerformed
+
+    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jComboBox1ActionPerformed
 
     public void SetTime(){
         new Thread(new Runnable() {

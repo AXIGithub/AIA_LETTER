@@ -12,11 +12,9 @@ import aia.model.BaseModel;
  * @author Ratino
  */
 public class Kpdi1Model extends BaseModel{
-    private String cnttype;
     private String srcebus;
     private String owrname;
     private String lifasrname;
-    private String occdate;
     private String ptdate;
     private String periode;
     private String validflag;

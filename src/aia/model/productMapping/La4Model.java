@@ -14,7 +14,6 @@ import aia.model.BaseModel;
 public class La4Model extends BaseModel{
     private String name;
     private String letseqno;
-    private String cntcurr;
     private String jatuhTem;
     private String sinstamt01;
     private String zmrktcd;
@@ -29,8 +28,8 @@ public class La4Model extends BaseModel{
     private String sumins;
     private String addressLL;
     private String noTelp;
-    private String billfreq;
-    private String occdate;
+    private String addres01;
+    private String addres02;
     private String sacscurbal;
     private String groupDesc;
     private String addressG1;
@@ -44,8 +43,25 @@ public class La4Model extends BaseModel{
     private String groupProd;
     private String srcebus;
     private String stateCode;
-    
 
+    public String getAddres01() {
+        return addres01;
+    }
+
+    public void setAddres01(String addres01) {
+        this.addres01 = addres01;
+    }
+
+    public String getAddres02() {
+        return addres02;
+    }
+
+    public void setAddres02(String addres02) {
+        this.addres02 = addres02;
+    }
+
+    
+    
     public String getName() {
         return name;
     }
@@ -60,14 +76,6 @@ public class La4Model extends BaseModel{
 
     public void setLetseqno(String letseqno) {
         this.letseqno = letseqno;
-    }
-
-    public String getCntcurr() {
-        return cntcurr;
-    }
-
-    public void setCntcurr(String cntcurr) {
-        this.cntcurr = cntcurr;
     }
 
     public String getJatuhTem() {
@@ -108,6 +116,14 @@ public class La4Model extends BaseModel{
 
     public void setPtdate(String ptdate) {
         this.ptdate = ptdate;
+    }
+
+    public String getCltpcode() {
+        return cltpcode;
+    }
+
+    public void setCltpcode(String cltpcode) {
+        this.cltpcode = cltpcode;
     }
 
     public String getProduct() {
@@ -158,28 +174,20 @@ public class La4Model extends BaseModel{
         this.sumins = sumins;
     }
 
+    public String getAddressLL() {
+        return addressLL;
+    }
+
+    public void setAddressLL(String addressLL) {
+        this.addressLL = addressLL;
+    }
+
     public String getNoTelp() {
         return noTelp;
     }
 
     public void setNoTelp(String noTelp) {
         this.noTelp = noTelp;
-    }
-
-    public String getBillfreq() {
-        return billfreq;
-    }
-
-    public void setBillfreq(String billfreq) {
-        this.billfreq = billfreq;
-    }
-
-    public String getOccdate() {
-        return occdate;
-    }
-
-    public void setOccdate(String occdate) {
-        this.occdate = occdate;
     }
 
     public String getSacscurbal() {
@@ -196,46 +204,6 @@ public class La4Model extends BaseModel{
 
     public void setGroupDesc(String groupDesc) {
         this.groupDesc = groupDesc;
-    }
-
-    public String getPhoneNo() {
-        return phoneNo;
-    }
-
-    public void setPhoneNo(String phoneNo) {
-        this.phoneNo = phoneNo;
-    }
-
-    public String getCabLl() {
-        return cabLl;
-    }
-
-    public void setCabLl(String cabLl) {
-        this.cabLl = cabLl;
-    }
-
-    public String getPeriod() {
-        return period;
-    }
-
-    public void setPeriod(String period) {
-        this.period = period;
-    }
-
-    public String getCltpcode() {
-        return cltpcode;
-    }
-
-    public void setCltpcode(String cltpcode) {
-        this.cltpcode = cltpcode;
-    }
-
-    public String getAddressLL() {
-        return addressLL;
-    }
-
-    public void setAddressLL(String addressLL) {
-        this.addressLL = addressLL;
     }
 
     public String getAddressG1() {
@@ -276,6 +244,30 @@ public class La4Model extends BaseModel{
 
     public void setAddressG5(String addressG5) {
         this.addressG5 = addressG5;
+    }
+
+    public String getPhoneNo() {
+        return phoneNo;
+    }
+
+    public void setPhoneNo(String phoneNo) {
+        this.phoneNo = phoneNo;
+    }
+
+    public String getCabLl() {
+        return cabLl;
+    }
+
+    public void setCabLl(String cabLl) {
+        this.cabLl = cabLl;
+    }
+
+    public String getPeriod() {
+        return period;
+    }
+
+    public void setPeriod(String period) {
+        this.period = period;
     }
 
     public String getGroupProd() {

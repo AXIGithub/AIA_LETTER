@@ -7,7 +7,8 @@ package aia.poa_product;
 
 import aia.controller.BasePdfGenerator;
 import aia.controller.TextModification;
-import aia.model.PolisModel;
+import aia.model.BaseModel;
+import aia.model.productMapping.AnrpeModel;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
@@ -18,7 +19,6 @@ import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
 import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.RomanList;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.ColumnText;
 import com.itextpdf.text.pdf.PdfContentByte;
@@ -32,8 +32,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  *
@@ -50,28 +53,48 @@ public class CreatePdfANRPE implements BasePdfGenerator{
     private BaseFont arialUnderlineBold;
     private BaseFont arialBold;    
     private BaseFont barcodeFont;
-    private float yAddr = 720;
-    private float xAddr = 38;
-    private float yInfo = 724;
-    private float xInfo = 262;
-    private float xDot = 451;
-    private float xDataInfo = 566;
+    private float yAddr;
+    private float xAddr;
+    private float yInfo;
+    private float xInfo;
+    private float xDot;
+    private float xDataInfo;
+    private float boxCenterX;
     
     private String currDir = new String();
     private String paperDir = new String();
     private String dirFonts = new String();
     private String sortingDir = new String();
     private String outputDir = new String();
+    private String fileName = new String();
+    private String barcode = new String();
     
     
 
     @Override
-    public void generate(PolisModel polisModel, String product, String[] params) throws Exception {
+    public void generate(List<BaseModel> dataList, String product, String cetak, String[] params) throws Exception {
+        if (dataList.isEmpty()) {
+            throw new IllegalArgumentException("Data kosong");
+        }
+
+        BaseModel first = dataList.get(0);
+        
+        if(!(first instanceof AnrpeModel)){
+            throw new IllegalArgumentException("Not Anrpe Model");
+        }
+        
+        AnrpeModel model = (AnrpeModel) first;
+        yAddr = 720;
+        xAddr = 38;
+        yInfo = 724;
+        xInfo = 262;
+        xDot = 451;
+        xDataInfo = 566;
         sortingDir = params[2];
         getCurrentDir();
         Document document = new Document(PageSize.A4);
         PdfWriter writer = PdfWriter.getInstance(document,
-                new FileOutputStream(sortingDir + product + "_" + polisModel.getChdrnum() + ".pdf"));
+                new FileOutputStream(sortingDir + product + model.getChdrnum() + "_" + cetak + ".pdf"));
         
         dataReaderPreprinted = new PdfReader(paperDir + "PAPER ANRPE.pdf");
 
@@ -100,18 +123,84 @@ public class CreatePdfANRPE implements BasePdfGenerator{
         canvas.showTextAligned(Element.ALIGN_LEFT, "Kepada Yth:", xAddr, yAddr, 0);
         yAddr = (float) (yAddr - 10);
         canvas.setFontAndSize(arialBold, 9.5f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "Bapak/Ibu [owner]", xAddr, yAddr, 0);
-        yAddr = (float) (yAddr - 10);
+        
+        String owner = model.getOwner(); 
+        String owner1 = owner;
+        String owner2 = "";
+        
+        String[] split = owner.split(" "); 
+        
+        if (owner.length() > 25) {
+            StringBuilder sb1 = new StringBuilder();
+            StringBuilder sb2 = new StringBuilder();
+
+            for (int i = 0; i < split.length; i++) {
+                if (i <= 1) { 
+                    sb1.append(split[i]).append(" ");
+                } else {
+                    sb2.append(split[i]).append(" ");
+                }
+            }
+
+            owner1 = sb1.toString().trim();
+            owner2 = sb2.toString().trim();
+        }
+        
+        canvas.showTextAligned(Element.ALIGN_LEFT, "Bpk/Ibu " + owner1, xAddr, yAddr, 0);
+        yAddr -= 10;
+        if (!owner2.isEmpty()) {
+            canvas.showTextAligned(Element.ALIGN_LEFT, owner2, xAddr, yAddr, 0);
+            yAddr -= 10;
+        }
+        
+        int emptyCount = 0;
+        if (!hasText(model.getAddr01())) emptyCount++;
+        if (!hasText(model.getAddr02())) emptyCount++;
+        if (!hasText(model.getAddr03())) emptyCount++;
+        if (!hasText(model.getAddr04())) emptyCount++;
+        if (!hasText(model.getAddr05())) emptyCount++;
+
+        List<String> addressLines = new ArrayList<>();
+
+        if (emptyCount >= 2) {
+            if (hasText(model.getAddr01())) {
+                addressLines.add(model.getAddr01());
+            }
+
+            String line23 = Stream.of(model.getAddr02(), model.getAddr03())
+                    .filter(this::hasText)
+                    .collect(Collectors.joining(" "));
+            if (!line23.isEmpty()) {
+                addressLines.add(line23);
+            }
+
+            String line45 = Stream.of(model.getAddr04(), model.getAddr05())
+                    .filter(this::hasText)
+                    .collect(Collectors.joining(" "));
+            if (!line45.isEmpty()) {
+                addressLines.add(line45);
+            }
+
+        } else {
+            if (hasText(model.getAddr01())) addressLines.add(model.getAddr01());
+            if (hasText(model.getAddr02())) addressLines.add(model.getAddr02());
+            if (hasText(model.getAddr03())) addressLines.add(model.getAddr03());
+            if (hasText(model.getAddr04())) addressLines.add(model.getAddr04());
+            if (hasText(model.getAddr05())) addressLines.add(model.getAddr05());
+        }
+        
+        if (hasText(model.getPcode())) {
+            addressLines.add(model.getPcode());
+        }
+        
         canvas.setFontAndSize(arial, 9.5f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "[alamat1]", xAddr, yAddr, 0);
-        yAddr = (float) (yAddr - 10);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "[alamat2]" + " " + "[alamat3]", xAddr, yAddr, 0);
-        yAddr = (float) (yAddr - 10);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "[alamat4]" + " " + "[alamat5]", xAddr, yAddr, 0);
-        yAddr = (float) (yAddr - 10);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "[kodePos]", xAddr, yAddr, 0);
+        for (String line : addressLines) {
+            canvas.showTextAligned(Element.ALIGN_LEFT, line, xAddr, yAddr, 0);
+            yAddr -= 10;
+        }
 
         // ================= INFO POLIS =====================
+        String kode = model.getCntcurr().equalsIgnoreCase("IRP") ? "Rp" : "USD";
         // LAPORAN
         canvas.setFontAndSize(arialBold, 12f);
         canvas.showTextAligned(Element.ALIGN_LEFT, "LAPORAN TAHUNAN", xInfo, yInfo, 0);
@@ -120,56 +209,89 @@ public class CreatePdfANRPE implements BasePdfGenerator{
         // No Polis
         canvas.setFontAndSize(arialBold, 8f);
         canvas.showTextAligned(Element.ALIGN_LEFT, "No. Polis", xInfo, yInfo, 0);
-        canvas.showTextAligned(Element.ALIGN_RIGHT, "[noPolis]", xDataInfo, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_RIGHT, model.getChdrnum(), xDataInfo, yInfo, 0);
         yInfo -= 10;
         // Tertanggung
         canvas.setFontAndSize(arial, 8f);
         canvas.showTextAligned(Element.ALIGN_LEFT, "Tertanggung", xInfo, yInfo, 0);
-        canvas.showTextAligned(Element.ALIGN_RIGHT, "[namaTertanggung]", xDataInfo, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_RIGHT, model.getInsured(), xDataInfo, yInfo, 0);
         yInfo -= 16;
 
         // Jumlah Premi Dasar
         canvas.showTextAligned(Element.ALIGN_LEFT, "Jumlah Premi Dasar", xInfo, yInfo, 0);
-        canvas.showTextAligned(Element.ALIGN_RIGHT, "[premiKontribusiDasar]", xDataInfo, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_RIGHT, kode + txt.setCurrencyIdr(model.getPremamt1()), xDataInfo, yInfo, 0);
         yInfo -= 10;
         // Jumlah Premi Tambahan
         canvas.showTextAligned(Element.ALIGN_LEFT, "Jumlah Premi Tambahan", xInfo, yInfo, 0);
-        canvas.showTextAligned(Element.ALIGN_RIGHT, "[premiKontribusiBerkala]", xDataInfo, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_RIGHT, kode + txt.setCurrencyIdr(model.getPremamt2()), xDataInfo, yInfo, 0);
         yInfo -= 16;
 
         // Status Polis
+        String status;
+        switch (model.getStatcode()) {
+            case "IF":
+                status = "Aktif";
+                break;
+            case "CF":
+                status = "CF";
+                break;
+            case "NF":
+                status = "Tidak Aktif";
+                break;
+            default:
+                status = "Unknown";
+                break;
+        }
         canvas.showTextAligned(Element.ALIGN_LEFT, "Status Polis", xInfo, yInfo, 0);
-        canvas.showTextAligned(Element.ALIGN_RIGHT, "Aktif", xDataInfo, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_RIGHT, status, xDataInfo, yInfo, 0);
         yInfo -= 10;
         // Cara Bayar
-        String periode = polisModel.getBillfreq().equals("12") ? "Bulanan" : polisModel.getBillfreq();
+        String periode;
+        switch (model.getBillFreq()) {
+            case "12":
+                periode = "Bulanan";
+                break;
+            case "04":
+                periode = "Triwulan";
+                break;
+            case "02":
+                periode = "Semesteran";
+                break;
+            case "01":
+                periode = "Tahunan";
+                break;
+            default:
+                periode = "Sekaligus";
+                break;
+        }
         canvas.showTextAligned(Element.ALIGN_LEFT, "Cara Bayar", xInfo, yInfo, 0);
-        canvas.showTextAligned(Element.ALIGN_RIGHT, "[periode]", xDataInfo, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_RIGHT, periode, xDataInfo, yInfo, 0);
         yInfo -= 10;
         // Tanggal Mulai Asuransi
         canvas.showTextAligned(Element.ALIGN_LEFT, "Tanggal Mulai Asuransi", xInfo, yInfo, 0);
-        canvas.showTextAligned(Element.ALIGN_RIGHT, "[tanggalMulai]", xDataInfo, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_RIGHT, txt.convertDateMM(model.getOccdate()), xDataInfo, yInfo, 0);
         yInfo -= 16;
 
         // Nama Produk
         canvas.setFontAndSize(arialBold, 8f);
         canvas.showTextAligned(Element.ALIGN_LEFT, "Nama Produk", xInfo, yInfo, 0);
-        canvas.showTextAligned(Element.ALIGN_RIGHT, "[namaProduk]" , xDataInfo, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_RIGHT, model.getProdName() , xDataInfo, yInfo, 0);
         yInfo -= 10;
         // Uang Pertanggungan/Santunan Asuransi Dasar
         canvas.setFontAndSize(arial, 8f);
         canvas.showTextAligned(Element.ALIGN_LEFT, "Uang Pertanggungan/", xInfo, yInfo, 0);
-        canvas.showTextAligned(Element.ALIGN_RIGHT, "[uangPertanggungan]" , xDataInfo, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_RIGHT, kode + txt.setCurrencyIdr(model.getSumins()) , xDataInfo, yInfo, 0);
         yInfo -= 10;
         // Mata Uang
+        String currency = model.getCntcurr().equalsIgnoreCase("IRP") ? "Rupiah" : "Dollar Amerika";
         canvas.showTextAligned(Element.ALIGN_LEFT, "Mata Uang", xInfo, yInfo, 0);
-        canvas.showTextAligned(Element.ALIGN_RIGHT, "[mataUang]" , xDataInfo, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_RIGHT, currency , xDataInfo, yInfo, 0);
         yInfo -= 16;
         
         // Tanggal cetak
         canvas.setFontAndSize(arialBold, 8f);
         canvas.showTextAligned(Element.ALIGN_LEFT, "Tanggal cetak", xInfo, yInfo, 0);
-        canvas.showTextAligned(Element.ALIGN_RIGHT, "[tanggalCetak]" , xDataInfo, yInfo, 0);
+        canvas.showTextAligned(Element.ALIGN_RIGHT, txt.convertDateMM(cetak) , xDataInfo, yInfo, 0);
         canvas.endText();
         
         // ===================== ISI SURAT ==========================
@@ -179,7 +301,7 @@ public class CreatePdfANRPE implements BasePdfGenerator{
         float currentY = pageTopY;
         int rightX = 548; // Posisi kanan kolom
 
-        String bar = "RANGKUMAN MANFAAT ASURANSI ([CURRFROM] - [CURRTO])";
+        String bar = "RANGKUMAN MANFAAT ASURANSI (" + txt.convertDateMM(model.getPeriodFr()) + " - " + txt.convertDateMM(model.getPeriodTo()) + ")";
         
         float barHeight = 17f;
         float barX = 30f;
@@ -193,7 +315,21 @@ public class CreatePdfANRPE implements BasePdfGenerator{
         canvas.restoreState();
         
         canvas.beginText();
-        txt.writeParagraph(bar, document, 149, pageBottomY, rightX, currentY + barHeight - 2, canvas, arialBold, 10, 1.2f);
+        ColumnText ctBar = new ColumnText(canvas);
+        ctBar.setSimpleColumn(
+                barX,                     
+                currentY,                 
+                barX + barWidth,          
+                currentY + barHeight      
+        );
+
+        Paragraph p = new Paragraph(bar, new Font(arialBold, 10));
+        p.setAlignment(Element.ALIGN_CENTER);
+        p.setLeading(12);
+
+        ctBar.addElement(p);
+        ctBar.go();
+
         canvas.endText();
         currentY -= (barHeight + 10);
         
@@ -232,18 +368,18 @@ public class CreatePdfANRPE implements BasePdfGenerator{
             Arrays.asList(
                 new SaldoItem(
                     "Akumulasi Manfaat Dijamin s/d tanggal (07 Des 2024)",
-                    "Rp0,00"
+                    kode + "0,00"
                 ),
                 new SaldoItem(
                     "Manfaat Dijamin yang telah dikreditkan tanggal (06 Des 2025)",
-                    "Rp0,00"
+                    kode + "0,00"
                 ),
                 new SaldoItem(
                     "Akumulasi penarikan Manfaat Dijamin (07 Des 2024 - 06 Des 2025)",
-                    "Rp0,00"
+                    kode + "0,00"
                 )
             ),
-            "Rp0,00"
+            kode + "0,00"
         ));
 
         groups.add(new SaldoGroup(
@@ -251,23 +387,22 @@ public class CreatePdfANRPE implements BasePdfGenerator{
             Arrays.asList(
                 new SaldoItem(
                     "Akumulasi Manfaat Tidak Dijamin s/d tanggal (07 Des 2024)",
-                    "Rp0,00"
+                    kode + "0,00"
                 ),
                 new SaldoItem(
                     "Manfaat Tidak Dijamin yang telah dikreditkan tanggal (06 Des 2025)",
-                    "Rp0,00"
+                    kode + "0,00"
                 ),
                 new SaldoItem(
                     "Akumulasi penarikan Manfaat Tidak Dijamin tahun berjalan (07 Des 2024 - 06 Des 2025)",
-                    "Rp0,00"
+                    kode + "0,00"
                 )
             ),
-            "Rp0,00"
+            kode + "0,00"
         ));
         
         for (SaldoGroup group : groups) {
-
-            // ===== JUDUL GROUP =====
+            
             PdfPCell groupCell = new PdfPCell(
                 new Phrase(group.title, fontArialB)
             );
@@ -285,20 +420,18 @@ public class CreatePdfANRPE implements BasePdfGenerator{
             empty.setPaddingLeft(4);
             empty.setBorder(Rectangle.LEFT | Rectangle.RIGHT );
             table.addCell(empty);
-
-            // ===== DETAIL =====
+            
             for (int i = 0; i < group.items.size(); i++) {
                 SaldoItem item = group.items.get(i);
 
-                Paragraph p = new Paragraph(item.keterangan, fontArial);
-
-                // 👉 hanya item ke-3 (index 2) yang menjorok
+                Paragraph p1 = new Paragraph(item.keterangan, fontArial);
+                
                 if (i == 2) {
-                    p.setIndentationLeft(15f); // atur sesuai kebutuhan
+                    p1.setIndentationLeft(15f);
                 }
 
                 PdfPCell c1 = new PdfPCell();
-                c1.addElement(p);
+                c1.addElement(p1);
                 c1.setPaddingTop(0);
                 c1.setPaddingBottom(2);
                 c1.setPaddingLeft(4);
@@ -313,9 +446,7 @@ public class CreatePdfANRPE implements BasePdfGenerator{
                 c2.setBorder(Rectangle.LEFT | Rectangle.RIGHT );
                 table.addCell(c2);
             }
-
-
-            // ===== TOTAL =====
+            
             PdfPCell totalLabel = new PdfPCell(
                 new Phrase("Total Saldo", fontArialB)
             );
@@ -377,15 +508,15 @@ public class CreatePdfANRPE implements BasePdfGenerator{
                 int idx = 0;
                 for (String sub : item.subItems) {
 
-                    Paragraph p = new Paragraph();
-                    p.setFont(textFont);
-                    p.setIndentationLeft(30);
-                    p.setLeading(10);
+                    Paragraph p2 = new Paragraph();
+                    p2.setFont(textFont);
+                    p2.setIndentationLeft(30);
+                    p2.setLeading(10);
 
-                    p.add(ROMAN[idx++] + ". ");
-                    p.add(sub);
+                    p2.add(ROMAN[idx++] + ". ");
+                    p2.add(sub);
 
-                    mainItem.add(p);
+                    mainItem.add(p2);
                     mainItem.add(Chunk.NEWLINE);
                 }
             }
@@ -396,10 +527,10 @@ public class CreatePdfANRPE implements BasePdfGenerator{
         ct.setSimpleColumn(xAddr, pageBottomY, xDataInfo, currentY);
         ct.addElement(mainList);
         
-        int status = ct.go();
+        int stat = ct.go();
         items.clear();
         
-        if (ColumnText.hasMoreText(status)) {
+        if (ColumnText.hasMoreText(stat)) {
             document.newPage();
             canvas = writer.getDirectContent();
 
@@ -414,7 +545,7 @@ public class CreatePdfANRPE implements BasePdfGenerator{
         
         canvas.beginText();
         canvas.setFontAndSize(arialBold, 8f);
-        canvas.showTextAligned(Element.ALIGN_LEFT,"Jakarta, [OCCDATE]" , xAddr, 148, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT,"Jakarta, " + model.getOccdate() , xAddr, 148, 0);
         canvas.endText();
         
         document.newPage();
@@ -423,7 +554,6 @@ public class CreatePdfANRPE implements BasePdfGenerator{
         
         
         float yTransaksi = 700;
-        float xTransaksi = 30;
         float currentY2 = yTransaksi;
         
         canvas.saveState();
@@ -432,25 +562,32 @@ public class CreatePdfANRPE implements BasePdfGenerator{
         canvas.fill();
         canvas.restoreState();
         
-        currentY2 += 17;
+        currentY2 += 1;
         
-        String bar2 = "RANGKUMAN TRANSAKSI ([CURRFROM] - [CURRTO])";
+        String bar2 = "RANGKUMAN TRANSAKSI (" + txt.convertDateMM(model.getPeriodFr()) + " - " + txt.convertDateMM(model.getPeriodTo()) + ")";
         
-        txt.writeParagraph(bar2, document, 165, pageBottomY, rightX, currentY2, canvas, arialBold, 10f, 1.2f);
+        ColumnText ctBar2 = new ColumnText(canvas);
+        ctBar2.setSimpleColumn(
+                barX,                     
+                currentY2,                 
+                barX + barWidth,          
+                currentY2 + barHeight      
+        );
+
+        Paragraph p4 = new Paragraph(bar2, new Font(arialBold, 10));
+        p4.setAlignment(Element.ALIGN_CENTER);
+        p4.setLeading(12);
+
+        ctBar2.addElement(p4);
+        ctBar2.go();
         currentY2 -= 35;
         
         table2.setTotalWidth(new float[] {400, 137});
         table2.setLockedWidth(true);
         
         float tableHeight2 = table.getTotalHeight();
-
-//        if (currentY2 - tableHeight2 < pageBottomY) {
-//            document.newPage();
-//            canvas = writer.getDirectContent();
-//            currentY2 = yTransaksi;
-//        }
         
-        //Header
+        
         PdfPCell header4 = new PdfPCell(new Phrase("Keterangan", new Font(arialBold, 8.5f)));
         header4.setPadding(5);
         header4.setHorizontalAlignment(Element.ALIGN_CENTER);
@@ -482,15 +619,14 @@ public class CreatePdfANRPE implements BasePdfGenerator{
             Arrays.asList(
                 new SaldoItem(
                     "Total Pinjaman Polis",
-                    "Rp0,00"
+                    kode + "0,00"
                 )
             ),
             ""
         ));
         
         for (SaldoGroup group : groups1) {
-
-            // ===== JUDUL GROUP =====
+            
             PdfPCell groupCell = new PdfPCell(
                 new Phrase(group.title, fontArialB)
             );
@@ -508,17 +644,16 @@ public class CreatePdfANRPE implements BasePdfGenerator{
             empty.setPaddingLeft(4);
             empty.setBorder(Rectangle.LEFT | Rectangle.RIGHT );
             table2.addCell(empty);
-
-            // ===== DETAIL =====
+            
             for (int i = 0; i < group.items.size(); i++) {
                 SaldoItem item = group.items.get(i);
 
-                Paragraph p = new Paragraph(item.keterangan, fontArial);
+                Paragraph p3 = new Paragraph(item.keterangan, fontArial);
                 
-                p.setIndentationLeft(20);
+                p3.setIndentationLeft(20);
 
                 PdfPCell c1 = new PdfPCell();
-                c1.addElement(p);
+                c1.addElement(p3);
                 c1.setPaddingTop(0);
                 c1.setPaddingBottom(15);
                 c1.setPaddingLeft(4);
@@ -572,12 +707,24 @@ public class CreatePdfANRPE implements BasePdfGenerator{
         canvas.fill();
         canvas.restoreState();
         
-        currentY2 += 17;
+        currentY2 += 1;
         
-        String bar3 = "RINCIAN TRANSAKSI ([CURRFROM] - [CURRTO])";
+        String bar3 = "RINCIAN TRANSAKSI (" +  txt.convertDateMM(model.getPeriodFr()) + " - " + txt.convertDateMM(model.getPeriodTo()) + ")";
         
-        txt.writeParagraph(bar3, document, 178, pageBottomY, rightX, currentY2, canvas, arialBold, 10f, 1.2f);
-        
+        ColumnText ctBar3 = new ColumnText(canvas);
+        ctBar3.setSimpleColumn(
+                barX,                     
+                currentY2,                 
+                barX + barWidth,          
+                currentY2 + barHeight      
+        );
+
+        Paragraph p5 = new Paragraph(bar3, new Font(arialBold, 10));
+        p5.setAlignment(Element.ALIGN_CENTER);
+        p5.setLeading(12);
+
+        ctBar3.addElement(p5);
+        ctBar3.go();
         currentY2 -= 20;
         
         table3.setTotalWidth(new float[]{75, 360, 102});
@@ -691,6 +838,10 @@ public class CreatePdfANRPE implements BasePdfGenerator{
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
+    private boolean hasText(String s) {
+        return s != null && !s.trim().isEmpty();
+    }
+    
     class SaldoItem {
         String keterangan;
         String jumlah;
@@ -742,4 +893,30 @@ public class CreatePdfANRPE implements BasePdfGenerator{
         }
     }
     
+    private static final Set<String> PRIORITY_TYPES =
+            Set.of("EPR", "PIR");
+    
+    public boolean isPriority(BaseModel model){
+        String cntType = model.getCnttype();
+        if(cntType == null){
+            return false;
+        }
+        return PRIORITY_TYPES.contains(cntType);
+    }
+    
+    public String getFileName(){    
+        return fileName;
+    }
+    
+    public String getBarcodes(){
+        return barcode;
+    }
+    
+    public float getYaddr(){
+        return yAddr;
+    }
+    
+    public float getXbox(){
+        return boxCenterX;
+    }
 }

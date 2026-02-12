@@ -11,6 +11,7 @@ import aia.poa_product.CreatePdfANRPE;
 import aia.poa_product.CreatePdfANST;
 import aia.poa_product.CreatePdfAPH;
 import aia.poa_product.CreatePdfAPL;
+import aia.poa_product.CreatePdfBTLCR;
 import aia.poa_product.CreatePdfORP;
 import aia.poa_product.CreatePdfCL;
 import aia.poa_product.CreatePdfCVT;
@@ -34,8 +35,11 @@ import aia.poa_product.CreatePdfNCB;
 import aia.poa_product.CreatePdfNFUL;
 import aia.poa_product.CreatePdfOAD;
 import aia.poa_product.CreatePdfPAPH;
+import aia.poa_product.CreatePdfPDFR;
+import aia.poa_product.CreatePdfPDFW;
 import aia.poa_product.CreatePdfPMRC;
 import aia.poa_product.CreatePdfPOTNR;
+import aia.poa_product.CreatePdfPRTNR;
 import aia.poa_product.CreatePdfPTP;
 import aia.poa_product.CreatePdfRAB;
 import aia.poa_product.CreatePdfROP;
@@ -45,6 +49,7 @@ import aia.poa_product.CreatePdfSRN2;
 import aia.poa_product.CreatePdfSSNA;
 import aia.poa_product.CreatePdfTHP1;
 import aia.poa_product.CreatePdfTUTP;
+import aia.poa_product.CreatePdfUBC;
 import aia.poa_product.CreatePdfWDNC;
 import aia.poa_product.CreatePdfWDNN;
 import aia.poa_product.CreatePdfWDNW;
@@ -84,10 +89,20 @@ public class LetterFactory {
                 return new CreatePdfMPH();
             case "NCB":
                 return new CreatePdfNCB();
+            case "ORP":
+                return new CreatePdfORP();
+            case "PDFR":
+                return new CreatePdfPDFR();
+            case "PDFW":
+                return new CreatePdfPDFW();
             case "POTNR":
                 return new CreatePdfPOTNR();
+            case "PRTNR":
+                return new CreatePdfPRTNR();
             case "RAB":
                 return new CreatePdfRAB();
+            case "UBC":
+                return new CreatePdfUBC();
             case "WDNC":
                 return new CreatePdfWDNC();
             case "WDNN":
@@ -99,7 +114,7 @@ public class LetterFactory {
             case "APL":
                 return new CreatePdfAPL();
             case "BTLCR":
-                return new CreatePdfORP();
+                return new CreatePdfBTLCR();
             case "DVD1":
                 return new CreatePdfDVD1();
             case "EPML":

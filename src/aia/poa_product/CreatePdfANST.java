@@ -7,7 +7,8 @@ package aia.poa_product;
 
 import aia.controller.BasePdfGenerator;
 import aia.controller.TextModification;
-import aia.model.PolisModel;
+import aia.model.BaseModel;
+import aia.model.productMapping.ExpyModel;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
@@ -18,7 +19,6 @@ import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
 import com.itextpdf.text.Rectangle;
-import com.itextpdf.text.RomanList;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.ColumnText;
 import com.itextpdf.text.pdf.PdfContentByte;
@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -48,30 +49,43 @@ public class CreatePdfANST implements BasePdfGenerator{
     
     private BaseFont arial;
     private BaseFont arialUnderlineBold;
-    private BaseFont arialBold;    
-    private BaseFont barcodeFont;
+    private BaseFont arialBold;
     private float yAddr = 720;
     private float xAddr = 38;
     private float yInfo = 724;
     private float xInfo = 262;
     private float xDot = 451;
     private float xDataInfo = 566;
+    private float boxCenterX;
     
     private String currDir = new String();
     private String paperDir = new String();
     private String dirFonts = new String();
     private String sortingDir = new String();
     private String outputDir = new String();
+    private String fileName = new String();
+    private String barcode = new String();
     
     
 
     @Override
-    public void generate(PolisModel polisModel, String product, String[] params) throws Exception {
+    public void generate(List<BaseModel> dataList, String product, String cetak, String[] params) throws Exception {
+        if (dataList.isEmpty()) {
+            throw new IllegalArgumentException("Data kosong");
+        }
+
+        BaseModel first = dataList.get(0);
+        
+        if(!(first instanceof ExpyModel)){
+            throw new IllegalArgumentException("Not Expy Model");
+        }
+        
+        ExpyModel model = (ExpyModel) first;
         sortingDir = params[2];
         getCurrentDir();
         Document document = new Document(PageSize.A4);
         PdfWriter writer = PdfWriter.getInstance(document,
-                new FileOutputStream(sortingDir + product + "_" + polisModel.getChdrnum() + ".pdf"));
+                new FileOutputStream(sortingDir + product + "_" + model.getChdrnum() + ".pdf"));
         
         dataReaderPreprinted = new PdfReader(paperDir + "PAPER ANRPE.pdf");
 
@@ -97,19 +111,19 @@ public class CreatePdfANST implements BasePdfGenerator{
         canvas.setFontAndSize(arial, 8f);
 
         // ================= HEADER =======================
-        canvas.showTextAligned(Element.ALIGN_LEFT, "Kepada Yth:", xAddr, yAddr, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, "Kepada yang terhormat :", xAddr, yAddr, 0);
         yAddr = (float) (yAddr - 10);
         canvas.setFontAndSize(arialBold, 9.5f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "Bapak/Ibu [owner]", xAddr, yAddr, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, "Bapak/Ibu " + model.getOwner(), xAddr, yAddr, 0);
         yAddr = (float) (yAddr - 10);
         canvas.setFontAndSize(arial, 9.5f);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "[alamat1]", xAddr, yAddr, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, model.getAddr01(), xAddr, yAddr, 0);
         yAddr = (float) (yAddr - 10);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "[alamat2]" + " " + "[alamat3]", xAddr, yAddr, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, model.getAddr02() + " " + model.getAddr03(), xAddr, yAddr, 0);
         yAddr = (float) (yAddr - 10);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "[alamat4]" + " " + "[alamat5]", xAddr, yAddr, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, model.getAddr04() + " " + model.getAddr05(), xAddr, yAddr, 0);
         yAddr = (float) (yAddr - 10);
-        canvas.showTextAligned(Element.ALIGN_LEFT, "[kodePos]", xAddr, yAddr, 0);
+        canvas.showTextAligned(Element.ALIGN_LEFT, model.getPcode(), xAddr, yAddr, 0);
 
         // ================= INFO POLIS =====================
         // LAPORAN
@@ -141,11 +155,11 @@ public class CreatePdfANST implements BasePdfGenerator{
         canvas.showTextAligned(Element.ALIGN_LEFT, "Status Polis", xInfo, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_RIGHT, "Aktif", xDataInfo, yInfo, 0);
         yInfo -= 10;
-        // Cara Bayar
-        String periode = polisModel.getBillfreq().equals("12") ? "Bulanan" : polisModel.getBillfreq();
-        canvas.showTextAligned(Element.ALIGN_LEFT, "Cara Bayar", xInfo, yInfo, 0);
-        canvas.showTextAligned(Element.ALIGN_RIGHT, "[periode]", xDataInfo, yInfo, 0);
-        yInfo -= 10;
+//        // Cara Bayar
+//        String periode = model.model.getb.equals("12") ? "Bulanan" : model.getb;
+//        canvas.showTextAligned(Element.ALIGN_LEFT, "Cara Bayar", xInfo, yInfo, 0);
+//        canvas.showTextAligned(Element.ALIGN_RIGHT, "[periode]", xDataInfo, yInfo, 0);
+//        yInfo -= 10;
         // Tanggal Mulai Asuransi
         canvas.showTextAligned(Element.ALIGN_LEFT, "Tanggal Mulai Asuransi", xInfo, yInfo, 0);
         canvas.showTextAligned(Element.ALIGN_RIGHT, "[tanggalMulai]", xDataInfo, yInfo, 0);
@@ -740,6 +754,33 @@ public class CreatePdfANST implements BasePdfGenerator{
         } catch (IOException ex) {
             Logger.getLogger(CreatePdfAPH.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    private static final Set<String> PRIORITY_TYPES =
+            Set.of("kosong");
+    
+    public boolean isPriority(BaseModel model){
+        String cntType = model.getCnttype();
+        if(cntType == null){
+            return false;
+        }
+        return PRIORITY_TYPES.contains(cntType);
+    }
+    
+    public String getFileName(){
+        return fileName;
+    }
+    
+    public String getBarcodes(){
+        return barcode;
+    }
+    
+    public float getYaddr(){
+        return yAddr;
+    }
+    
+    public float getXbox(){
+        return boxCenterX;
     }
     
 }

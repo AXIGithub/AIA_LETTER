@@ -5,13 +5,14 @@
  */
 package aia.model.productMapping;
 
+import aia.model.BaseModel;
+
 /**
  *
  * @author Ratino
  */
-public class MamaModel {
+public class MamaModel extends BaseModel {
     private String prodId;
-    private String cnttype;
     private String premCess;
     private String riskCess;
     private String sumins;
@@ -19,7 +20,6 @@ public class MamaModel {
     private String zservstat;
     private String zsbname;
     private String letterSta;
-    private String statcode;
     private String userProfi;
     private String jobName;
     private String dateime;

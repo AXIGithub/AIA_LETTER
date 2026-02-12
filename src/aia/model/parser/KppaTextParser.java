@@ -17,9 +17,9 @@ public class KppaTextParser implements BaseTextParserInterface{
     @Override
     public BaseModel parse(String[] c) {
         KppaModel model = new KppaModel();
-        model.setPolicyNo(c[0]);
+        model.setChdrnum(c[0]);
         model.setCownnum(c[1]);
-        model.setZowner(c[2]);
+        model.setOwner(c[2]);
         model.setAddr01(c[3]);
         model.setAddr02(c[4]);
         model.setAddr03(c[5]);
@@ -36,7 +36,7 @@ public class KppaTextParser implements BaseTextParserInterface{
         model.setSrcebus(c[16]);
         model.setOccdate(c[17]);
         model.setStatcode(c[18]);
-        model.setBillfreq(c[19]);
+        model.setBillFreq(c[19]);
         model.setPremi(c[20]);
         model.setInstfrom(c[21]);
         model.setPtd(c[22]);
@@ -46,8 +46,8 @@ public class KppaTextParser implements BaseTextParserInterface{
         model.setNldKSts(c[26]);
         model.setFlgSyariah(c[27]);
         model.setFlgEstate(c[28]);
-        model.setEmail(c[29]);
-        model.setPhonecell(c[30]);
+        model.setCltEmail(c[29]);
+        model.setPhoneCell(c[30]);
         model.setDteBirth(c[31]);
         
         return model;

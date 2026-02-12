@@ -12,15 +12,11 @@ import aia.model.BaseModel;
  * @author Ratino
  */
 public class LiudModel extends BaseModel{
-    private String cnttype;
     private String srcebus;
     private String lifcnum;
     private String insured;
     private String cownnum;
-    private String cntcurr;
     private String sumins;
-    private String billfreq;
-    private String occdate;
     private String ptrneff;
     private String usrProfil;
     private String jobName;
@@ -30,7 +26,6 @@ public class LiudModel extends BaseModel{
     private String dBillfreq;
     private String sacscurbal;
     private String sinstamt;
-    private String statcode;
     private String zservstat;
     private String topupVi;
     private String cabLb;
@@ -40,14 +35,6 @@ public class LiudModel extends BaseModel{
     private String ysustyp;
     private String rekAia;
     private String vaOwner;
-
-    public String getCnttype() {
-        return cnttype;
-    }
-
-    public void setCnttype(String cnttype) {
-        this.cnttype = cnttype;
-    }
 
     public String getSrcebus() {
         return srcebus;
@@ -81,36 +68,12 @@ public class LiudModel extends BaseModel{
         this.cownnum = cownnum;
     }
 
-    public String getCntcurr() {
-        return cntcurr;
-    }
-
-    public void setCntcurr(String cntcurr) {
-        this.cntcurr = cntcurr;
-    }
-
     public String getSumins() {
         return sumins;
     }
 
     public void setSumins(String sumins) {
         this.sumins = sumins;
-    }
-
-    public String getBillfreq() {
-        return billfreq;
-    }
-
-    public void setBillfreq(String billfreq) {
-        this.billfreq = billfreq;
-    }
-
-    public String getOccdate() {
-        return occdate;
-    }
-
-    public void setOccdate(String occdate) {
-        this.occdate = occdate;
     }
 
     public String getPtrneff() {
@@ -183,14 +146,6 @@ public class LiudModel extends BaseModel{
 
     public void setSinstamt(String sinstamt) {
         this.sinstamt = sinstamt;
-    }
-
-    public String getStatcode() {
-        return statcode;
-    }
-
-    public void setStatcode(String statcode) {
-        this.statcode = statcode;
     }
 
     public String getZservstat() {

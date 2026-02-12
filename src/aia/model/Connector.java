@@ -26,11 +26,29 @@ public class Connector {
     
     public void setStatement() {
         try {
-            koneksi = DriverManager.getConnection("jdbc:mysql://localhost/db_bni_billing?autoReconnect=true&failOverReadonly=false&maxReconnects=1000", "root", "");
+            koneksi = DriverManager.getConnection("jdbc:mysql://localhost/db_aia?autoReconnect=true&failOverReadonly=false&maxReconnects=1000", "root", "");
             stmt = koneksi.createStatement();
+            System.out.println("Sukses Koneksi database");
         }
        catch (SQLException ex) {
             Logger.getLogger(Connector.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+    public Connection getKoneksi() {
+        return koneksi;
+    }
+
+    public void setKoneksi(Connection koneksi) {
+        this.koneksi = koneksi;
+    }
+
+    public Statement getStmt() {
+        return stmt;
+    }
+
+    public void setStmt(Statement stmt) {
+        this.stmt = stmt;
+    }
 }
+

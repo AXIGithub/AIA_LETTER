@@ -5,15 +5,48 @@
  */
 package utils;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  *
  * @author Ratino
  */
 public class ProductCode {
     
-    
     public String getProductCode(String fileName){
-        return fileName.split("_")[0];
+        // kondisi untuk beberapa produk
+        String code = fileName.split("_")[0];
+        switch (code) {
+            case "WARISAN":
+                code = "PDFW";
+                break;
+            case "PDF":
+                code = "PDFR";
+                break;
+            case "DISHONOR":
+                code = "SDHN";
+                break;
+            case "EPTLTH":
+                code = "EPT";
+                break;
+            case "SURATMEDIX":
+                code = "MEDIX";
+                break;
+            case "WDN-C":
+                code = "WDNC";
+                break;
+            case "WDN-N":
+                code = "WDNN";
+                break;
+            case "WDN-W":
+                code = "WDNW";
+                break;
+            default:
+                break;
+        }
+        return code;
     }
     
     public String getDescriptionProduct(String productCode){
@@ -42,18 +75,28 @@ public class ProductCode {
                 return "Laporan Tahunan";
             case "NCB":
                 return "NCB";
+            case "ORP":
+                return "Status Tenaga Pemasar";
             case "POTNR":
                 return "POTNR Letter";
+            case "PRTNR":
+                return "PRTNR Letter";
             case "RAB":
                 return "Laporan Tahunan";
+            case "UBC":
+                return "UBC Letter";
             case "SPN":
                 return "Konfirmasi Titipan Premi/Kontribusi";
+            
+            // New Business product
             case "WDNC":
                 return "Pembatalan Surat Pengajuan Asuransi";
             case "WDNN":
                 return "Pembatalan Surat Pengajuan Asuransi";
             case "WDNW":
                 return "Pembatalan Surat Pengajuan Asuransi";
+                
+            // POA product
             case "APH":
                 return "Status Polis Menjadi Cuti Premi/Kontribusi Otomatis";
             case "APL":
@@ -86,6 +129,10 @@ public class ProductCode {
                 return "Perubahan Alamat Korespondensi";
             case "PAPH":
                 return "Konfirmasi Penghentian Cuti Premi Otomatis";
+            case "PDFR":
+                return "Laporan Transaksi Premi Rezeki Family";
+            case "PDFW":
+                return "Pemberitahuan Saldo Premi Deposit";
             case "PMRC":
                 return "Pengambilan Manfaat Asuransi/Dana Investasi";
             case "PTP":
@@ -108,4 +155,22 @@ public class ProductCode {
                 return "";
         }
     }
+    
+    public static final Set<String> POA_PRODUCTS = new HashSet<>(
+        Arrays.asList(
+            "APH","APL","BTLCR","DVD1","EPML","EPRB",
+            "KPDI1","KPDI2","KPPA","LANF","LIUD",
+            "MAAMA","MAPM","NAD","NFUL","OAD",
+            "PAPH","PDFR","PDFW","PMRC","PTP","ROP","SPNP",
+            "SRN1","SRN2","SSNA","THP1","TUTP",
+            "PDFR","PDFW"
+        )
+    );
+    
+    public static final Set<String> NB_PRODUCTS = new HashSet<>(
+        Arrays.asList(
+            "WDNC","WDNN","WDNW"
+        )
+    );
+
 }

@@ -52,7 +52,7 @@ public class DbfConverter {
             
             Object[] row;
             while ((row = reader.nextRecord()) != null) {
-                System.out.println("ROW : " + row.length);
+//                System.out.println("ROW : " + row.length);
                 for (int i = 0; i < row.length; i++) {
 //                    System.out.println(row[i].toString().trim());
 

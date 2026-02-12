@@ -516,9 +516,9 @@ private static final String[] ANGKA = {"", "satu", "dua", "tiga", "empat", "lima
     }
 
     public String setCurrencyIdr(String value){
-        if(value.startsWith("-")){
-            value = value.substring(1);
-        }
+//        if(value.startsWith("-")){
+//            value = value.substring(1);
+//        }
         
         value = value.replace(".", ",");
         boolean statusKoma = false;
@@ -724,14 +724,16 @@ private static final String[] ANGKA = {"", "satu", "dua", "tiga", "empat", "lima
     public String convertDate(String calendar){
       if(calendar.length()>6){
         String year = calendar.substring(calendar.length()-4);
-        String date = calendar.substring(calendar.length()-6,calendar.length()-4);
+        String date = new String();
         String month = new String();
         
         if(calendar.length()==7){
-            month = calendar.substring(calendar.length()-calendar.length(),1);
+            month = calendar.substring(calendar.length()- 5, calendar.length()-3);
+            date = calendar.substring(calendar.length()- calendar.length(),calendar.length()-6);
         }
         else if(calendar.length()==8){
-            month = calendar.substring(calendar.length()-calendar.length(),2);
+            month = calendar.substring(calendar.length()-6, calendar.length()-4);
+            date = calendar.substring(calendar.length()- calendar.length(),calendar.length()-6);
         }
         //System.out.println("DATE : " + month);
 
@@ -781,10 +783,20 @@ private static final String[] ANGKA = {"", "satu", "dua", "tiga", "empat", "lima
     }
     
     public String convertDateMM(String dateParam) throws ParseException{
-        SimpleDateFormat input = new SimpleDateFormat("yyyyMMdd");
-        SimpleDateFormat output = new SimpleDateFormat("dd MMMM yyyy", new Locale("id", "ID"));
-        Date date = input.parse(dateParam);
-        return output.format(date);
+        // kondisi pada model date null
+        if ((dateParam) == null || dateParam.trim().isEmpty()){
+            return "";
+        }
+        
+        try {
+            SimpleDateFormat input = new SimpleDateFormat("yyyyMMdd");
+            SimpleDateFormat output = new SimpleDateFormat("dd MMMM yyyy", new Locale("id", "ID"));
+            Date date = input.parse(dateParam);
+            return output.format(date);
+        } catch (Exception e) {
+            return "";
+        }
+        
         
     }
 
@@ -925,7 +937,7 @@ private static final String[] ANGKA = {"", "satu", "dua", "tiga", "empat", "lima
     }
 
     public String reduceDecimal(String value){
-        int index = value.indexOf(".");
+        int index = value.indexOf(",");
         if(index>-1){
             String part1 = value.substring(0,index);
             String part2 = value.substring(index,index+3);
@@ -1136,64 +1148,65 @@ private static final String[] ANGKA = {"", "satu", "dua", "tiga", "empat", "lima
 //    }
     
     public void writeParagraph(String text, Document document, float left, float bottom, float right, float top, PdfContentByte canvas, BaseFont baseFont, float fontSize, float lineSpacing) {
-        if (text == null) text = "";
-        
-        Font contentFont = new Font(baseFont, fontSize, Font.NORMAL);
-        Font boldFont = new Font(baseFont, fontSize, Font.BOLD);
-        Font linkFont = new Font(baseFont, fontSize, Font.UNDERLINE);
-        Font italicFont = new Font(baseFont, fontSize, Font.ITALIC);
-        
-        Pattern combined = Pattern.compile(
-            "(\\[b\\](.*?)\\[/b\\])" +       
-            "|(\\[i\\](.*?)\\[/i\\])" +  
-            "|(\\[u\\](.*?)\\[/u\\])" +
-            "|(https?://\\S+)",            
-            Pattern.DOTALL | Pattern.CASE_INSENSITIVE
-        );
 
-        Matcher m = combined.matcher(text);
+        if (text == null) text = "";
 
         Phrase phrase = new Phrase();
-        int lastEnd = 0;
 
-        while (m.find()) {
-            if (m.start() > lastEnd) {
-                String before = text.substring(lastEnd, m.start());
-                if (!before.isEmpty()) {
-                    phrase.add(new Chunk(before, contentFont));
-                }
+        boolean bold = false;
+        boolean italic = false;
+        boolean underline = false;
+
+        StringBuilder buffer = new StringBuilder();
+
+        for (int i = 0; i < text.length(); ) {
+
+            // ===== TAG OPEN / CLOSE =====
+            if (text.startsWith("[b]", i)) {
+                flush(phrase, buffer, baseFont, fontSize, bold, italic, underline);
+                bold = true;
+                i += 3;
+                continue;
             }
-            
-            String boldGroup = m.group(2); 
-            String italicGroup = m.group(4); 
-            String underlineGroup = m.group(6); 
-            String linkGroup = m.group(7); 
-
-            if (boldGroup != null) {
-                phrase.add(new Chunk(boldGroup, boldFont));
-            } else if (italicGroup != null){
-                phrase.add(new Chunk(italicGroup, italicFont));
-            } else if (underlineGroup != null) {
-                Chunk underlineChunk = new Chunk(underlineGroup, contentFont);
-                underlineChunk.setUnderline(1.5f, -2f);
-                phrase.add(underlineChunk);
-            } else if (linkGroup != null) {
-                Chunk linkChunk = new Chunk(linkGroup, linkFont);
-                // Jika ingin membuat clickable link dalam PDF (yang membuka URL), uncomment:
-                // linkChunk.setAnchor(linkGroup);
-                phrase.add(linkChunk);
+            if (text.startsWith("[/b]", i)) {
+                flush(phrase, buffer, baseFont, fontSize, bold, italic, underline);
+                bold = false;
+                i += 4;
+                continue;
+            }
+            if (text.startsWith("[i]", i)) {
+                flush(phrase, buffer, baseFont, fontSize, bold, italic, underline);
+                italic = true;
+                i += 3;
+                continue;
+            }
+            if (text.startsWith("[/i]", i)) {
+                flush(phrase, buffer, baseFont, fontSize, bold, italic, underline);
+                italic = false;
+                i += 4;
+                continue;
+            }
+            if (text.startsWith("[u]", i)) {
+                flush(phrase, buffer, baseFont, fontSize, bold, italic, underline);
+                underline = true;
+                i += 3;
+                continue;
+            }
+            if (text.startsWith("[/u]", i)) {
+                flush(phrase, buffer, baseFont, fontSize, bold, italic, underline);
+                underline = false;
+                i += 4;
+                continue;
             }
 
-            lastEnd = m.end();
+            buffer.append(text.charAt(i));
+            i++;
         }
-        
-        if (lastEnd < text.length()) {
-            phrase.add(new Chunk(text.substring(lastEnd), contentFont));
-        }
-        
+
+        flush(phrase, buffer, baseFont, fontSize, bold, italic, underline);
+
         ColumnText ct = new ColumnText(canvas);
         ct.setSimpleColumn(left, bottom, right, top);
-        
         ct.setLeading(0, lineSpacing);
         ct.setAlignment(Element.ALIGN_JUSTIFIED);
         ct.setText(phrase);
@@ -1204,4 +1217,33 @@ private static final String[] ANGKA = {"", "satu", "dua", "tiga", "empat", "lima
             e.printStackTrace();
         }
     }
+    
+    private void flush(
+            Phrase phrase,
+            StringBuilder buffer,
+            BaseFont baseFont,
+            float fontSize,
+            boolean bold,
+            boolean italic,
+            boolean underline
+    ) {
+        if (buffer.length() == 0) return;
+
+        int style = Font.NORMAL;
+        if (bold && italic) style = Font.BOLDITALIC;
+        else if (bold) style = Font.BOLD;
+        else if (italic) style = Font.ITALIC;
+
+        Font font = new Font(baseFont, fontSize, style);
+        Chunk chunk = new Chunk(buffer.toString(), font);
+
+        if (underline) {
+            chunk.setUnderline(1f, -1.5f);
+        }
+
+        phrase.add(chunk);
+        buffer.setLength(0);
+    }
+
+
 }

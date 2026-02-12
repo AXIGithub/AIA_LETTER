@@ -13,29 +13,17 @@ import aia.model.BaseModel;
  */
 public class EpmlModel extends BaseModel{
     private String clientNum;
-    private String owner;
-    private String alamat1;
-    private String alamat2;
-    private String alamat3;
-    private String alamat4;
-    private String alamat5;
-    private String cltpcode;
     private String rmblPhone;
-    private String cnttype;
     private String srcebus;
-    private String statcode;
     private String life;
     private String insured;
     private String sinstamt;
-    private String billfreq;
     private String billchnl;
     private String longdesc;
     private String ptdate;
     private String benef;
     private String batctrcde;
     private String trdtp;
-    private String prodName;
-    private String flgSyariah;
 
     public String getClientNum() {
         return clientNum;
@@ -43,62 +31,6 @@ public class EpmlModel extends BaseModel{
 
     public void setClientNum(String clientNum) {
         this.clientNum = clientNum;
-    }
-
-    public String getOwner() {
-        return owner;
-    }
-
-    public void setOwner(String owner) {
-        this.owner = owner;
-    }
-
-    public String getAlamat1() {
-        return alamat1;
-    }
-
-    public void setAlamat1(String alamat1) {
-        this.alamat1 = alamat1;
-    }
-
-    public String getAlamat2() {
-        return alamat2;
-    }
-
-    public void setAlamat2(String alamat2) {
-        this.alamat2 = alamat2;
-    }
-
-    public String getAlamat3() {
-        return alamat3;
-    }
-
-    public void setAlamat3(String alamat3) {
-        this.alamat3 = alamat3;
-    }
-
-    public String getAlamat4() {
-        return alamat4;
-    }
-
-    public void setAlamat4(String alamat4) {
-        this.alamat4 = alamat4;
-    }
-
-    public String getAlamat5() {
-        return alamat5;
-    }
-
-    public void setAlamat5(String alamat5) {
-        this.alamat5 = alamat5;
-    }
-
-    public String getCltpcode() {
-        return cltpcode;
-    }
-
-    public void setCltpcode(String cltpcode) {
-        this.cltpcode = cltpcode;
     }
 
     public String getRmblPhone() {
@@ -109,28 +41,12 @@ public class EpmlModel extends BaseModel{
         this.rmblPhone = rmblPhone;
     }
 
-    public String getCnttype() {
-        return cnttype;
-    }
-
-    public void setCnttype(String cnttype) {
-        this.cnttype = cnttype;
-    }
-
     public String getSrcebus() {
         return srcebus;
     }
 
     public void setSrcebus(String srcebus) {
         this.srcebus = srcebus;
-    }
-
-    public String getStatcode() {
-        return statcode;
-    }
-
-    public void setStatcode(String statcode) {
-        this.statcode = statcode;
     }
 
     public String getLife() {
@@ -155,14 +71,6 @@ public class EpmlModel extends BaseModel{
 
     public void setSinstamt(String sinstamt) {
         this.sinstamt = sinstamt;
-    }
-
-    public String getBillfreq() {
-        return billfreq;
-    }
-
-    public void setBillfreq(String billfreq) {
-        this.billfreq = billfreq;
     }
 
     public String getBillchnl() {
@@ -211,22 +119,6 @@ public class EpmlModel extends BaseModel{
 
     public void setTrdtp(String trdtp) {
         this.trdtp = trdtp;
-    }
-
-    public String getProdName() {
-        return prodName;
-    }
-
-    public void setProdName(String prodName) {
-        this.prodName = prodName;
-    }
-
-    public String getFlgSyariah() {
-        return flgSyariah;
-    }
-
-    public void setFlgSyariah(String flgSyariah) {
-        this.flgSyariah = flgSyariah;
     }
     
     
